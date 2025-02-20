@@ -28,6 +28,7 @@ const Character = ({ position, movePlayer }) => {
                 objectFit: "cover",
                 transition: "top 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), left 0.5s cubic-bezier(0.25, 0.8, 0.25, 1)",
                 filter: "drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.2)) drop-shadow(-5px -5px 5px rgba(0, 0, 0, 0.1))",
+                zIndex: 2
             }}
         />
     )
