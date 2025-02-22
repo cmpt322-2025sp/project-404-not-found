@@ -88,9 +88,9 @@ const App = () => {
     return (
         <Playground>
             <Character position={character_position} movePlayer={movePlayer} ></Character>
-            <Egg position={object_1_position} is_colliding={is_colliding_1} />
-            <Egg position={object_2_position} is_colliding={is_colliding_2} />
-            <Egg position={object_3_position} is_colliding={is_colliding_3} />
+            <Egg position={object_1_position} is_colliding={is_colliding_1} game="Game One" />
+            <Egg position={object_2_position} is_colliding={is_colliding_2} game="Game Two" />
+            <Egg position={object_3_position} is_colliding={is_colliding_3} game="Game Three" />
         </Playground>
     );
 }
