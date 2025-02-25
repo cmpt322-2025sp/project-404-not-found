@@ -13,7 +13,7 @@ const Character = ({ position, movePlayer }) => {
         return () => {
             window.removeEventListener("keydown", handleKeyPress)
         }
-    }, [])
+    })
 
     return(
         <img 
@@ -28,6 +28,7 @@ const Character = ({ position, movePlayer }) => {
                 objectFit: "cover",
                 transition: "top 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), left 0.5s cubic-bezier(0.25, 0.8, 0.25, 1)",
                 filter: "drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.2)) drop-shadow(-5px -5px 5px rgba(0, 0, 0, 0.1))",
+                // filter: "drop-shadow(0px 20px 40px rgba(0, 0, 0, 0.7)) drop-shadow(0px 15px 30px rgba(0, 0, 0, 0.6)) drop-shadow(0px 10px 20px rgba(0, 0, 0, 0.5))",
                 zIndex: 2
             }}
         />

@@ -3,9 +3,23 @@ import React, { useState } from "react"
 import Playground from "./components/Playground"
 import Character from "./components/Character"
 import Egg from "./components/Egg"
+import ProgressBar from "./components/ProgressBar"
 import { character_speed, character_dimension, character_initial_position, island_positions } from "./Const"
 
 const App = () => {
+
+    // Score Data
+    const [scores, setScores] = useState({
+        "Game One": 0,
+        "Game Two": 0,
+        "Game Three": 0
+    })
+    const handleScoreFromEgg = (game, score) => {
+        setScores((prevScores) => ({
+          ...prevScores,
+          [game]: score,
+        }))
+    }
 
 
     const getPixelPosition = (vw, vh) => {
@@ -88,9 +102,16 @@ const App = () => {
     return (
         <Playground>
             <Character position={character_position} movePlayer={movePlayer} ></Character>
-            <Egg position={object_1_position} is_colliding={is_colliding_1} game="Game One" />
-            <Egg position={object_2_position} is_colliding={is_colliding_2} game="Game Two" />
-            <Egg position={object_3_position} is_colliding={is_colliding_3} game="Game Three" />
+            {scores["Game One"] === 0 && (
+                <Egg position={object_1_position} is_colliding={is_colliding_1} game="Game One" onScore={handleScoreFromEgg} />
+            )}
+            {scores["Game Two"] === 0 && (
+                <Egg position={object_2_position} is_colliding={is_colliding_2} game="Game Two" onScore={handleScoreFromEgg} />
+            )}
+            {scores["Game Three"] === 0 && (
+                <Egg position={object_3_position} is_colliding={is_colliding_3} game="Game Three" onScore={handleScoreFromEgg} />
+            )}
+            <ProgressBar scores={scores}></ProgressBar>
         </Playground>
     );
 }
