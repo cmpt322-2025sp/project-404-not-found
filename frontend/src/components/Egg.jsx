@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 
 import TestGame from "./games/TestGame"
 
-const Egg = ({ position, is_colliding, game }) => {
+const Egg = ({ position, is_colliding, game, onScore }) => {
 
     const [isPopupOpen, setIsPopupOpen] = useState(false)
 
@@ -16,16 +16,21 @@ const Egg = ({ position, is_colliding, game }) => {
         setIsPopupOpen(false)
     }
 
+    const handleScoreSubmission = (gameScore) => {
+        setIsPopupOpen(false)
+        onScore(game, gameScore)
+    }
+
     let gameTitle = game
 
     const renderGame = () => {
         switch (game) {
             case 'Game One':
-                return <TestGame />
+                return <p>NO GAMES ATTACHED</p>
             case 'Game Two':
-                return <TestGame />
+                return <p>NO GAMES ATTACHED</p>
             case 'Game Three':
-                return <TestGame />
+                return <TestGame onScoreSubmission={handleScoreSubmission} />
             default:
                 return null
         }

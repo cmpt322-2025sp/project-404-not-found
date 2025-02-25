@@ -48,13 +48,12 @@ const playgroundStyle = {
     width: "100%",
     height: "100%",
     overflow: "hidden",
-    // backgroundColor: "skyblue"
-    background: `
-        linear-gradient(90deg, rgba(0, 191, 255, 0.5) 25%, rgba(30, 144, 255, 0.5) 50%, rgba(0, 191, 255, 0.5) 75%), 
-        linear-gradient(90deg, rgba(0, 191, 255, 0.5) 25%, rgba(30, 144, 255, 0.5) 50%, rgba(0, 191, 255, 0.5) 75%)
-    `, // Blue gradient
-    backgroundSize: "200% 100%", // Makes the gradient large enough to animate
-    animation: "flowingWater 3s ease infinite", // Animation to move the gradient
+    background: `repeating-linear-gradient(45deg, 
+        #6b8e23, 
+        #6b8e23 10px, 
+        #8b9b24 10px, 
+        #8b9b24 20px)`,
+    backgroundSize: "9px 9px"
 };
 
 const style = `
@@ -63,18 +62,6 @@ const style = `
         height: auto;
         position: absolute;
         filter: "drop-shadow(0px 40px 60px rgba(0, 0, 0, 1)) drop-shadow(0px 30px 50px rgba(0, 0, 0, 1))",
-    }
-
-    @keyframes flowingWater {
-        0% {
-            background-position: 0% 0%, 100% 0%;
-        }
-        50% {
-            background-position: 50% 0%, 150% 0%;
-        }
-        100% {
-            background-position: 100% 0%, 200% 0%;
-        }
     }
 `;
 
