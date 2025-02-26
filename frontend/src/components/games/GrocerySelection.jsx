@@ -44,7 +44,6 @@ export default function GrocerySelection({ onScoreSubmission }) {
 
       const newX = Math.floor(Math.random() * 11);
       const newY = Math.floor(Math.random() * 11);
-
       setObjectData({
         x: newX,
         y: newY,
