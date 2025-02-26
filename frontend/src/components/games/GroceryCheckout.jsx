@@ -53,10 +53,10 @@ function ConfettiEffect() {
   );
 }
 
-export default function GroceryCheckout() {
+export default function GroceryCheckout({previousScore}) {
   const [groceries] = useState(() => getGroceriesWithRandomPrices());
 
-  const [score, setScore] = useState(1000);
+  const [score, setScore] = useState(previousScore);
 
   const [isGameOver, setIsGameOver] = useState(false);
 
@@ -73,7 +73,7 @@ export default function GroceryCheckout() {
     const userTotal = parseInt(totalRef.current.value, 10) || 0;
 
     if (userTotal === actualTotal) {
-      setFeedback(`Hooray! You got it right! The total is $${actualTotal}.`);
+      setFeedback(`Hooray! You got it right! The total is $${actualTotal} and you got a score of ${score}.`);
       if (successAudioRef.current) {
         successAudioRef.current.currentTime = 0;
         successAudioRef.current.play();
@@ -230,6 +230,28 @@ export default function GroceryCheckout() {
                 Check Out
               </button>
             </>
+          )}
+
+          {/* If the game is over, show a "Continue" button (does nothing yet) */}
+          {isGameOver && (
+            <button
+              style={{
+                marginTop: "1.2rem",
+                padding: "0.6rem 1.2rem",
+                cursor: "pointer",
+                backgroundColor: "#4CAF50",
+                color: "#fff",
+                border: "none",
+                borderRadius: "12px",
+                fontSize: "1rem",
+                boxShadow: "0 3px 5px rgba(0,0,0,0.3)",
+                transition: "transform 0.1s",
+              }}
+              onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
+              onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
+            >
+              Continue
+            </button>
           )}
 
           {feedback && (
