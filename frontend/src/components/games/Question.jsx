@@ -28,16 +28,12 @@ export default function Question(props) {
             alignItems: "center",
             justifyContent: "center",
             padding: "1%",
-             marginTop: "-10%"
+             marginTop: "-17%",
+             marginLeft: "-1.5%"
 
         }}
     >
-        <h1
-        style={{
-            // position: "absolute",
-            // left: "75px",
-        }}
-        >
+        <h1>
           {fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)]}
         {props.x} + {props.y}
         </h1>
@@ -51,17 +47,14 @@ export default function Question(props) {
         type="text"
         placeholder="answer"
         style={{
-            // position: "absolute",
-            // left: "30px",
-            // top: "70px",
-            color: "pink",
+            color: "purple",
+             backgroundColor: "lightgrey"
+            
         }}
         onKeyDown={handleKeyDown}
         />
         <button style={{
-            // position: "absolute",
-            // left: "180px",
-            // top: "70px",
+            backgroundColor: "lightgreen"
             
         }}
         onClick={handleClick}> SEND</button>
