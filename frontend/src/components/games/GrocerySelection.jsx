@@ -12,7 +12,7 @@ export default function GrocerySelection() {
   const [nextQuestion, setNextQuestion] = useState(false);
   const [prevQuestion,setPrevQuestion] = useState(null);
   const [score, setScore] = useState(1000);
-
+  const [circles, setCircles] = useState(Array(10).fill(' ⚫'));
   // const[counter, setCounter] = useState(0);
 
   const [objectData, setObjectData] = useState({
@@ -22,23 +22,30 @@ export default function GrocerySelection() {
     correctAnswer: initialX + initialY
   });
 
-  
+  const getColor = (score) => {
+    if (score <= 500) return 'red';
+    if (score <= 800) return 'orange';
+    return 'green';
+  };
   
   
 
   function handleAnswerCheck(userInput) {
     const numericValue = parseInt(userInput, 10);
    
+
     if (numericValue === objectData.correctAnswer) {
       setCount((prevCount) => prevCount + 1);
 
-      if(parseInt(count) >= 10 || score <=0){
+
+      if(parseInt(count) >= 9 || score <= 50){
         setWinner(true);
         return;
       }
 
       const newX = Math.floor(Math.random() * 11);
       const newY = Math.floor(Math.random() * 11);
+
       
       setObjectData({
         x: newX,
@@ -46,6 +53,10 @@ export default function GrocerySelection() {
         color: "white",
         correctAnswer: newX + newY,
       });
+      if(circles[count] !== ' 🟡'){
+        circles[count] = ' 🟢';  
+        setCircles([...circles]);
+      }
 
       
     } else {
@@ -54,6 +65,8 @@ export default function GrocerySelection() {
         color: "red",
       }));
       setScore((prevScore) => prevScore -50);
+      circles[count] = ' 🟡';
+      setCircles([...circles]);
     }
   }
 
@@ -72,6 +85,8 @@ export default function GrocerySelection() {
         flexDirection: "column"
       }}
     >
+
+        
     <div
       id="header"
       style={{
@@ -82,10 +97,37 @@ export default function GrocerySelection() {
         width: "560px",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        marginTop: "-11%",
+        marginTop: "-18%",
         marginLeft: "-1%"
       }}
     >
+
+<button style={{
+          // position: "absolute",
+          height: "40px",
+          width: "60px",
+          marginLeft: "9%",
+          marginTop: "20%"
+          
+
+        }} onClick={() => {
+            if(score > 0){
+             setScore((prevScore) => prevScore -100);
+            
+             setPrevQuestion(objectData.correctAnswer); 
+             setNextQuestion(true);
+             handleAnswerCheck(objectData.correctAnswer); 
+             if(count<10){
+             circles[count] = ' 🔴'; 
+             setCircles([...circles]);
+             }
+             const timer = setTimeout(() => {
+              setNextQuestion(false); 
+            }, 1000);
+          }
+          
+        }}> SKIP</button> 
+
     </div>
       <Question
         x={objectData.x}
@@ -93,66 +135,79 @@ export default function GrocerySelection() {
         color={objectData.color}
         onAnswerCheck={handleAnswerCheck} 
       />
-      <p> count: {count} , score: {score} </p>
+      <p>⭐</p>
 
-        
+      <div style={{
+         position: "absolute",
+         marginLeft: "-27%",
+         marginTop: "34%",
+         height: "150px",
+         width: "250px",
+         backgroundColor: "white"
+      }}>
+        <p style={{
+          marginLeft: "4%",
+          fontSize: "19px",
+          fontFamily: 'Impact'
+          }}>QUESTIONS LEFT: <br></br>  {circles} <br></br> CURRENT SCORE:</p>
+          <p style={{
+            marginTop: "-6%",
+            marginLeft: "4%",
+            fontSize: "40px",
+            fontFamily: 'Impact',
+            color: getColor(score)
+            
+          }}>  {score}</p>
+      </div>
+
        
-      <button style={{
-          // position: "absolute",
-          height: "40px",
-          width: "60px",
-          marginLeft: "-30%"
-
-        }} onClick={() => {
-            if(score >0){
-             setScore((prevScore) => prevScore -100);
-            }
-             setPrevQuestion(objectData.correctAnswer); 
-             setNextQuestion(true);
-             handleAnswerCheck(objectData.correctAnswer); 
-             const timer = setTimeout(() => {
-              setNextQuestion(false); 
-            }, 3000);
-          
-        }}> SKIP</button> 
+      
 
       { winner && (
       <div
       style={{
       position: "absolute",
-      marginLeft: "-10%",
-      top: "170px",
-      height: "110px",
-      width: "270px",
-      backgroundColor: "white"
+       marginLeft: "-1%",
+      marginTop: "-32%",
+      height: "140px",
+      width: "240px",
+      backgroundColor: "gold",
+      color: getColor
       }}
       > 
       <h1 style={{
             position: "absolute",
-            left: "50px",
+            left: "30px",
+            top: "10px",
+            fontSize: "45px",
+            fontFamily: 'Impact'
         }}
-        > 🎉 score: {score} 🎉</h1>
+        > score: {score} 🎉</h1>
       </div>
     )}
 
 
-    { nextQuestion && ( <div
+     { nextQuestion && (  
+      <div
       style={{
       position: "absolute",
-      left: "790px",
-      top: "190px",
-      height: "50px",
-      width: "50px",
+      marginLeft: "25%",
+      marginTop: "-32%",
+      height: "100px",
+      width: "100px",
       backgroundColor: "lightgreen"
       }}
       > 
       <p style={{
             position: "absolute",
-            left: "20px",
+            left: "30px",
+            top: "-22px",
+            fontSize: "45px",
+            fontFamily: 'Impact'
         }}
         > {prevQuestion}</p>
       </div>
-    )}
+     )} 
 
  
      <div
@@ -163,11 +218,13 @@ export default function GrocerySelection() {
           width: "300px",
           backgroundSize: "cover",
           backgroundPosition: "center bottom",
-          top: "400px",
-          left: "690px",
+          top: "55%",
+          left: "55%",
         }} 
       />
     </div>
+
+    
    
   );
 }
