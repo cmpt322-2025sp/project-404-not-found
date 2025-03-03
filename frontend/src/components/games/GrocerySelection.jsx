@@ -50,8 +50,9 @@ export default function GrocerySelection({ onScoreSubmission }) {
         color: "white",
         correctAnswer: newX + newY,
       });
-      if(circles[count] !== ' 🟡'){
-        circles[count] = ' 🟢';  
+
+      if (circles[count] !== " 🟡") {
+        circles[count] = " 🟢";
         setCircles([...circles]);
       }
 
