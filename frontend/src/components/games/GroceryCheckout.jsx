@@ -88,7 +88,11 @@ export default function GroceryCheckout({previousScore}) {
       }
       setShowConfetti(false);
 
-      setScore((prev) => Math.max(0, prev - 50));
+      setScore((prev) => Math.max(0, prev - 100));
+    }
+    if (score === 0) {
+      setIsGameOver(true);
+      setFeedback(`Oops! You entered $${userTotal}, which is wrong. You got a total score of ${score}.`);
     }
   };
 

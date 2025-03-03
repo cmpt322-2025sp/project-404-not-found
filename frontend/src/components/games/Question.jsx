@@ -57,7 +57,7 @@ export default function Question(props) {
             backgroundColor: "lightgreen"
             
         }}
-        onClick={handleClick}> SEND</button>
+        onClick={handleClick}> SUBMIT</button>
 
         </div>
     </div>
