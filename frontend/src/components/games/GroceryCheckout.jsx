@@ -53,7 +53,8 @@ function ConfettiEffect() {
   );
 }
 
-export default function GroceryCheckout({previousScore}) {
+export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
+
   const [groceries] = useState(() => getGroceriesWithRandomPrices());
 
   const [score, setScore] = useState(previousScore);
@@ -95,6 +96,10 @@ export default function GroceryCheckout({previousScore}) {
       setFeedback(`Oops! You entered $${userTotal}, which is wrong. You got a total score of ${score}.`);
     }
   };
+
+  const submitScore = () => {
+      onScoreSubmission(Math.round((score/2000)*100))
+  }
 
   useEffect(() => {
     if (showConfetti) {
@@ -253,6 +258,7 @@ export default function GroceryCheckout({previousScore}) {
               }}
               onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
               onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
+              onClick={submitScore}
             >
               Continue
             </button>

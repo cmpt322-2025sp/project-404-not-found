@@ -5,7 +5,7 @@ import bob from "../../asset/images/bob2.png";
 import Question from "./Question";
 import GroceryCheckout from "./GroceryCheckout";
 
-export default function GrocerySelection() {
+export default function GrocerySelection({ onScoreSubmission }) {
   const [count, setCount] = useState(0);
   const initialX = Math.floor(Math.random() * 11);
   const initialY = Math.floor(Math.random() * 11);
@@ -69,7 +69,7 @@ export default function GrocerySelection() {
   if (showCheckout) {
     // Add 1000 to the final score for the next game
     const updatedScore = score + 1000;
-    return <GroceryCheckout previousScore={updatedScore} />;
+    return <GroceryCheckout previousScore={updatedScore} onScoreSubmission={onScoreSubmission} />;
   }
 
   return (

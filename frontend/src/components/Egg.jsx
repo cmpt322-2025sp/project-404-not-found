@@ -4,6 +4,7 @@ import { egg_dimension } from "../Const"
 import Modal from 'react-modal';
 
 import TestGame from "./games/TestGame"
+import GrocerySelection from "./games/GrocerySelection"
 
 const Egg = ({ position, is_colliding, game, onScore }) => {
 
@@ -28,7 +29,7 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
             case 'Game One':
                 return <p>NO GAMES ATTACHED</p>
             case 'Game Two':
-                return <p>NO GAMES ATTACHED</p>
+                return <GrocerySelection onScoreSubmission={handleScoreSubmission}></GrocerySelection>
             case 'Game Three':
                 return <TestGame onScoreSubmission={handleScoreSubmission} />
             default:

@@ -10,7 +10,7 @@ const App = () => {
 
     // Score Data
     const [scores, setScores] = useState({
-        "Game One": 0,
+        "Game One": 40,
         "Game Two": 0,
         "Game Three": 0
     })
