@@ -14,7 +14,7 @@ export default function GrocerySelection({ onScoreSubmission }) {
   const [nextQuestion, setNextQuestion] = useState(false);
   const [prevQuestion, setPrevQuestion] = useState(null);
   const [score, setScore] = useState(1000);
-  const [circles, setCircles] = useState(Array(10).fill(" ⚫"));
+  const [circles, setCircles] = useState(Array(10).fill("⚫"));
 
   const [showCheckout, setShowCheckout] = useState(false);
 
@@ -52,16 +52,29 @@ export default function GrocerySelection({ onScoreSubmission }) {
         correctAnswer: newX + newY,
       });
 
-      if (circles[count] !== " 🟡") {
-        circles[count] = " 🟢";
-        setCircles([...circles]);
-      }
+      setCircles((prevCircles) =>
+        prevCircles.map((c, i) => {
+          if (i === count && c!== "🟡") {
+            return "🟢";
+          } else {
+            return c;
+          }
+        })
+      );
+
     } else {
 
       setObjectData((prev) => ({ ...prev, color: "red" }));
       setScore((prevScore) => prevScore - 50);
-      circles[count] = " 🟡";
-      setCircles([...circles]);
+
+      const nextCircles = circles.map((c, i) => {
+        if (i === count) {
+          return "🟡";
+        } else {
+          return c;
+        }
+      });
+      setCircles(nextCircles)
     }
   }
 
@@ -115,8 +128,10 @@ export default function GrocerySelection({ onScoreSubmission }) {
               handleAnswerCheck(objectData.correctAnswer);
 
               if (count < 10) {
-                circles[count] = "🔴";
-                setCircles([...circles]);
+
+                setCircles((prevCircles) =>
+                  prevCircles.map((c, i) => (i === count ? "🔴" : c))
+                );
               }
               setTimeout(() => {
                 setNextQuestion(false);
@@ -156,7 +171,9 @@ export default function GrocerySelection({ onScoreSubmission }) {
           }}
         >
           QUESTIONS LEFT: <br />
-          {circles}
+          <div key={circles.join("")}>
+            {circles}
+          </div>
           <br />
           CURRENT SCORE:
         </p>
@@ -168,8 +185,9 @@ export default function GrocerySelection({ onScoreSubmission }) {
             fontFamily: "Impact",
             color: getColor(score),
           }}
+          key={circles.join("")+"_key_for_score"}
         >
-          {score}
+            {score}
         </p>
       </div>
 

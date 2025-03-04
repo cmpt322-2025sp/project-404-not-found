@@ -11,7 +11,7 @@ const App = () => {
     // Score Data
     const [scores, setScores] = useState({
         "Game One": 40,
-        "Game Two": 0,
+        "Grocery Store": 0,
         "Game Three": 0
     })
     const handleScoreFromEgg = (game, score) => {
@@ -105,8 +105,8 @@ const App = () => {
             {scores["Game One"] === 0 && (
                 <Egg position={object_1_position} is_colliding={is_colliding_1} game="Game One" onScore={handleScoreFromEgg} />
             )}
-            {scores["Game Two"] === 0 && (
-                <Egg position={object_2_position} is_colliding={is_colliding_2} game="Game Two" onScore={handleScoreFromEgg} />
+            {scores["Grocery Store"] === 0 && (
+                <Egg position={object_2_position} is_colliding={is_colliding_2} game="Grocery Store" onScore={handleScoreFromEgg} />
             )}
             {scores["Game Three"] === 0 && (
                 <Egg position={object_3_position} is_colliding={is_colliding_3} game="Game Three" onScore={handleScoreFromEgg} />

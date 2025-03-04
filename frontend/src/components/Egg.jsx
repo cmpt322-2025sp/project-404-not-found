@@ -28,7 +28,7 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
         switch (game) {
             case 'Game One':
                 return <p>NO GAMES ATTACHED</p>
-            case 'Game Two':
+            case 'Grocery Store':
                 return <GrocerySelection onScoreSubmission={handleScoreSubmission}></GrocerySelection>
             case 'Game Three':
                 return <TestGame onScoreSubmission={handleScoreSubmission} />
