@@ -5,7 +5,7 @@ import bob from "../../asset/images/bob2.png";
 import Question from "./Question";
 import GroceryCheckout from "./GroceryCheckout";
 
-export default function GrocerySelection() {
+export default function GrocerySelection({ onScoreSubmission }) {
   const [count, setCount] = useState(0);
   const initialX = Math.floor(Math.random() * 11);
   const initialY = Math.floor(Math.random() * 11);
@@ -14,7 +14,7 @@ export default function GrocerySelection() {
   const [nextQuestion, setNextQuestion] = useState(false);
   const [prevQuestion, setPrevQuestion] = useState(null);
   const [score, setScore] = useState(1000);
-  const [circles, setCircles] = useState(Array(10).fill(" ⚫"));
+  const [circles, setCircles] = useState(Array(10).fill("⚫"));
 
   const [showCheckout, setShowCheckout] = useState(false);
 
@@ -52,16 +52,29 @@ export default function GrocerySelection() {
         correctAnswer: newX + newY,
       });
 
-      if (circles[count] !== " 🟡") {
-        circles[count] = " 🟢";
-        setCircles([...circles]);
-      }
+      setCircles((prevCircles) =>
+        prevCircles.map((c, i) => {
+          if (i === count && c!== "🟡") {
+            return "🟢";
+          } else {
+            return c;
+          }
+        })
+      );
+
     } else {
 
       setObjectData((prev) => ({ ...prev, color: "red" }));
       setScore((prevScore) => prevScore - 50);
-      circles[count] = " 🟡";
-      setCircles([...circles]);
+
+      const nextCircles = circles.map((c, i) => {
+        if (i === count) {
+          return "🟡";
+        } else {
+          return c;
+        }
+      });
+      setCircles(nextCircles)
     }
   }
 
@@ -69,7 +82,7 @@ export default function GrocerySelection() {
   if (showCheckout) {
     // Add 1000 to the final score for the next game
     const updatedScore = score + 1000;
-    return <GroceryCheckout previousScore={updatedScore} />;
+    return <GroceryCheckout previousScore={updatedScore} onScoreSubmission={onScoreSubmission} />;
   }
 
   return (
@@ -115,8 +128,10 @@ export default function GrocerySelection() {
               handleAnswerCheck(objectData.correctAnswer);
 
               if (count < 10) {
-                circles[count] = "🔴";
-                setCircles([...circles]);
+
+                setCircles((prevCircles) =>
+                  prevCircles.map((c, i) => (i === count ? "🔴" : c))
+                );
               }
               setTimeout(() => {
                 setNextQuestion(false);
@@ -156,7 +171,9 @@ export default function GrocerySelection() {
           }}
         >
           QUESTIONS LEFT: <br />
-          {circles}
+          <div key={circles.join("")}>
+            {circles}
+          </div>
           <br />
           CURRENT SCORE:
         </p>
@@ -168,8 +185,9 @@ export default function GrocerySelection() {
             fontFamily: "Impact",
             color: getColor(score),
           }}
+          key={circles.join("")+"_key_for_score"}
         >
-          {score}
+            {score}
         </p>
       </div>
 

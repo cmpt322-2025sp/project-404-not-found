@@ -2,12 +2,6 @@ export default function Question(props) {
 
     const fruitEmojis = ["🍎", "🍌", "🍊", "🍓", "🍍", "🍉", "🍇", "🍒", "🍑", "🥭"];
 
-    function handleKeyDown(e) {
-    if (e.key === "Enter") {
-        props.onAnswerCheck(e.target.value);
-        e.target.value = "";
-    }
-    }
     function handleClick(e){
         const input = document.getElementById("answer"); 
         props.onAnswerCheck(input.value);
@@ -17,11 +11,6 @@ export default function Question(props) {
     return (
     <div
         style={{
-        // position: "absolute",
-        // left: "510px",
-        // top: "170px",
-        // height: "110px",
-        // width: "270px",
             backgroundColor: props.color,
             display: "flex",
             flexDirection: "column",
@@ -51,7 +40,6 @@ export default function Question(props) {
              backgroundColor: "lightgrey"
             
         }}
-        onKeyDown={handleKeyDown}
         />
         <button style={{
             backgroundColor: "lightgreen"

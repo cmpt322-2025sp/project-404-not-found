@@ -53,7 +53,8 @@ function ConfettiEffect() {
   );
 }
 
-export default function GroceryCheckout({previousScore}) {
+export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
+
   const [groceries] = useState(() => getGroceriesWithRandomPrices());
 
   const [score, setScore] = useState(previousScore);
@@ -96,6 +97,10 @@ export default function GroceryCheckout({previousScore}) {
     }
   };
 
+  const submitScore = () => {
+      onScoreSubmission(Math.round((score/2000)*100))
+  }
+
   useEffect(() => {
     if (showConfetti) {
       const timer = setTimeout(() => {
@@ -129,16 +134,17 @@ export default function GroceryCheckout({previousScore}) {
       <div
         style={{
           fontFamily: "'Comic Sans MS', cursive, sans-serif",
-          width: "100vw",
-          height: "100vh",
+          width: "100%",
+          height: "100%",
           backgroundImage: `url(${GroceryCheckoutbg})`,
           backgroundPosition: "center",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           display: "flex",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           alignItems: "center",
           position: "relative",
+          padding: "5%"
         }}
       >
         {/* Confetti */}
@@ -148,7 +154,7 @@ export default function GroceryCheckout({previousScore}) {
           style={{
             position: "relative",
             width: "360px",
-            minHeight: "520px",
+            // minHeight: "620px",
             padding: "1.5rem",
             borderRadius: "16px",
             boxShadow: "0 0 10px rgba(0,0,0,0.3)",
@@ -253,6 +259,7 @@ export default function GroceryCheckout({previousScore}) {
               }}
               onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
               onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
+              onClick={submitScore}
             >
               Continue
             </button>
