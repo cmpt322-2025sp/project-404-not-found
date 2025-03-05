@@ -143,8 +143,12 @@ export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
           display: "flex",
           justifyContent: "flex-start",
           alignItems: "center",
-          position: "relative",
-          padding: "5%"
+          position: "absolute",
+          top: 0,
+          left: 0,
+          padding: "5%",
+          boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
         {/* Confetti */}

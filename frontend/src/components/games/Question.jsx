@@ -17,7 +17,7 @@ export default function Question(props) {
             alignItems: "center",
             justifyContent: "center",
             padding: "1%",
-             marginTop: "-17%",
+             marginTop: "-7%",
              marginLeft: "-1.5%"
 
         }}
