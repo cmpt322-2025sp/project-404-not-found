@@ -113,7 +113,9 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
                         width: '85vw',
                         height: '85vh',
                         backgroundColor: 'white',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        display: 'flex',
+                        flexDirection: 'column',
                     }
                 }}
             >
@@ -126,7 +128,7 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
                         onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                     >❌</button>
                 </div>
-                <div style={{flex: 1, overflowY: 'auto'}}>
+                <div style={{flex: 1, overflowY: 'auto', position: 'relative'}}>
                     {renderGame()}
                 </div>
             </Modal>

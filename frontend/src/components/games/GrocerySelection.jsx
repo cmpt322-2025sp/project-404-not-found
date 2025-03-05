@@ -98,6 +98,11 @@ export default function GrocerySelection({ onScoreSubmission }) {
         alignItems: "center",
         justifyContent: "space-evenly",
         flexDirection: "column",
+        top: 0,
+        left: 0,
+        padding: "5%",
+        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <div
@@ -196,7 +201,7 @@ export default function GrocerySelection({ onScoreSubmission }) {
           style={{
             position: "absolute",
             marginLeft: "-1.5%",
-            marginTop: "-30%",
+            marginTop: "-20%",
             height: "180px",
             width: "300px",
             backgroundColor: "gold",
