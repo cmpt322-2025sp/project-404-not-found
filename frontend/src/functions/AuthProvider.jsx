@@ -7,16 +7,19 @@ const AuthContext = createContext()
 const AuthProvider = ({ children }) => {
 
     const [isAuthenticated, setAuthentication] = useState(false)
+    const [isAdmin, setAdmin] = useState(false)
     const navigateUser = useNavigate()
 
     useEffect(() => {
+        fetch(PROCESSURL + 'muffin/isAdmin', {method: 'GET', credentials: 'include'})
+            .then((res) => res.json())
+            .then((data) => {
+                setAdmin(data.value)
+            })
         fetch(PROCESSURL + 'muffin/isLoggedIn', {method: 'GET', credentials: 'include'})
             .then((res) => res.json())
             .then((data) => {
                 setAuthentication(data.value)
-                console.log("IS LOGGED IN")
-                console.log(data.value)
-                console.log(isAuthenticated)
             })
     }, [])
 
@@ -34,7 +37,7 @@ const AuthProvider = ({ children }) => {
             .then((response) => {
                 if(response.loggedIn){
                     setAuthentication(true)
-                    navigateUser('/game')
+                    response.adminLoggedIn ? navigateUser('/admin') : navigateUser('/game')
                     return true;
                 }else{
                     return JSON.stringify(response)
@@ -54,7 +57,7 @@ const AuthProvider = ({ children }) => {
             })
     }
 
-    return <AuthContext.Provider value={{ isAuthenticated, login, logout }}>{children}</AuthContext.Provider>
+    return <AuthContext.Provider value={{ isAuthenticated, isAdmin, login, logout }}>{children}</AuthContext.Provider>
 
 }
 
