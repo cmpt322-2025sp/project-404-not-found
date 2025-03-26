@@ -1,21 +1,28 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Layout from "../components/Layout"
-import Game from "./Game"
-import Login from "./Login"
 import AuthProvider from "../functions/AuthProvider"
 import ProtectedRoutes from "../components/ProtectedRoutes"
+import ProtectedAdminRoutes from "../components/ProtectedAdminRoutes"
+import Layout from "../components/Layout"
+import Page404 from "./Page404"
+
+import Game from "./Game"
+import Login from "./Login"
+import Admin from "./Admin"
 
 const Router = () => {
     return(
         <BrowserRouter>
             <AuthProvider>
             <Routes>
-                <Route path="/" element={ <Layout/> }>
-                    <Route index element={ <Login/> }/>
+                <Route path="/" element={ <Layout /> }>
+                    <Route index element={ <Login /> }/>
                     <Route element={<ProtectedRoutes />}>
                         <Route path="/game" element={<Game />} />
                     </Route>
-                    {/* <Route path="*" element={ <Page404/> }/> */}
+                    <Route element={<ProtectedAdminRoutes />}>
+                        <Route path="/admin/*" element={<Admin />} />
+                    </Route>
+                    <Route path="*" element={ <Page404/> }/>
                 </Route>
             </Routes>
             </AuthProvider>

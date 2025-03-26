@@ -7,8 +7,9 @@ const postLogin = async (req, res) => {
             const login = await UserFunctions.loginUser(req.body.email, req.body.h_password);
             if(login.authenticated){
                 req.session.isLoggedIn = true;
+                req.session.isAdmin = login.admin;
                 // UpdateDocument('users',{ email: req.body.email }, { last_login: new Date() });
-                res.json({ loggedIn: true });
+                res.json({ loggedIn: true, adminLoggedIn: login.admin });
             }else{
                 res.json({ loggedIn: false, error: login.error });
             }
