@@ -1,7 +1,17 @@
 const mongoose = require('mongoose');
 
 const UserModelSchema = new mongoose.Schema({
-    name: {
+    first_name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    last_name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    student_id: {
         type: String,
         required: true,
         trim: true,
@@ -9,20 +19,9 @@ const UserModelSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true,
         trim: true,
     },
-    is_verified: {
-        type: Boolean,
-        required: true,
-        default: false,
-    },
-    salt: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    password: {
+    classroom_id: {
         type: String,
         required: true,
         trim: true,
@@ -37,5 +36,6 @@ const UserModelSchema = new mongoose.Schema({
     collection: 'users',
 });
 
+UserModelSchema.index({ student_id: 1, classroom_id: 1 }, { unique: true });
 const UserModel = mongoose.model('UserModel',UserModelSchema);
 module.exports = UserModel;

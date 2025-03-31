@@ -3,11 +3,11 @@ import { Link } from "react-router-dom"
 
 const Logout = () => {
     const auth = useAuth()
-    const { isAdmin } = useAuth()
+    const { isAdmin, userFirstName } = useAuth()
 
     return (
         <div style={{ textAlign: 'center' }}>
-            <p>Welcome, <span style={{ fontWeight: 'bold', color: '#ff6600' }}>username</span>!</p>
+            <p>Welcome, <span style={{ fontWeight: 'bold', color: '#ff6600' }}>{userFirstName}</span>!</p>
             <button 
                 onClick={(e) => { 
                     e.preventDefault()

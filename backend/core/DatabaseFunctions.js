@@ -48,10 +48,23 @@ const FindDocument = (collection, condition = {}, projection = 'id') => {
     return Document;
 }
 
+const DeleteDocument = async (collection, condition) => {
+    try {
+        const Model = require('../models/' + collection);
+        const Document = await Model.deleteOne(condition);
+        console.log('CNSL_DLT Document Deleted');
+        return Document.deletedCount;
+    } catch (error) {
+        console.error('CNSL_ERR_DLT MongoDB Error: ', error);
+        return false;
+    }
+}
+
 module.exports = {
     ConnectDB,
     InsertDocument,
     UpdateDocument,
     FindDocuments,
-    FindDocument
+    FindDocument,
+    DeleteDocument
 }
