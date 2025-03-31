@@ -105,7 +105,36 @@ const ExpressServicesProvider = ({ children }) =>{
         })
     }
 
-    return <ExpressServicesContext.Provider value={{ createClassroom, retrieveClassrooms, uploadClassroomCSV, retrieveStudents, deleteClassroom }}>{children}</ExpressServicesContext.Provider>
+    const addStudent = (data) => {
+        return fetch(PROCESSURL + 'add_student', { 
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                csrf: data.csrf
+            },
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return {status: true}
+            }else{
+                return response
+            }
+        })
+    }
+
+    return (
+        <ExpressServicesContext.Provider value={{ 
+            createClassroom, 
+            retrieveClassrooms, 
+            uploadClassroomCSV, 
+            retrieveStudents, 
+            deleteClassroom, 
+            addStudent 
+        }}>{children}</ExpressServicesContext.Provider>
+    );
 
 }
 

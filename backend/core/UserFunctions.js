@@ -35,6 +35,7 @@ const updateStudentsCount = async (classroom_id, change) => {
 
 const createStudent = async (student_first_name, student_last_name, student_id, student_email, classroom_id) => {
     if(await FindDocument('users', {student_id: student_id, classroom_id: classroom_id})) return false
+    if(await FindDocument('users', {email: student_email, classroom_id: classroom_id})) return false
     const user = await InsertDocument('users', {first_name: student_first_name, last_name: student_last_name, student_id: student_id, email: student_email, classroom_id: classroom_id})
     return user ? true : false
 }
