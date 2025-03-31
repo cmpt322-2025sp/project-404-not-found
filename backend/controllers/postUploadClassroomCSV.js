@@ -40,7 +40,7 @@ const postUploadClassroomCSV = async (req, res) => {
                 if (result) {
                     numOfStudents++
                 } else {
-                    console.error('Failed to insert row:', rowData)
+                    console.error('Row Not Inserted:', rowData)
                 }
             }
 
