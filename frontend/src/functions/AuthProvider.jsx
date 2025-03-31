@@ -8,6 +8,8 @@ const AuthProvider = ({ children }) => {
 
     const [isAuthenticated, setAuthentication] = useState(false)
     const [isAdmin, setAdmin] = useState(false)
+    const [userId, setUserId] = useState(null)
+    const [userFirstName, setUserFirstName] = useState(null)
     const navigateUser = useNavigate()
 
     useEffect(() => {
@@ -16,6 +18,16 @@ const AuthProvider = ({ children }) => {
             .then((data) => {
                 setAdmin(data.value)
             })
+        fetch(PROCESSURL + 'muffin/userId', {method: 'GET', credentials: 'include'})
+            .then((res) => res.json())
+            .then((data) => {
+                setUserId(data.value)
+            })
+        fetch(PROCESSURL + 'muffin/userFirstName', {method: 'GET', credentials: 'include'})
+            .then((res) => res.json())
+            .then((data) => {
+                setUserFirstName(data.value)
+            })
         fetch(PROCESSURL + 'muffin/isLoggedIn', {method: 'GET', credentials: 'include'})
             .then((res) => res.json())
             .then((data) => {
@@ -23,27 +35,35 @@ const AuthProvider = ({ children }) => {
             })
     }, [])
 
-    const login = (data) => {
-        return fetch(PROCESSURL + 'login', { 
-            method: "POST",
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
-            body: JSON.stringify(data)
-        })
-            .then((res) => res.json())
-            .then((response) => {
-                if(response.loggedIn){
-                    setAuthentication(true)
-                    response.adminLoggedIn ? navigateUser('/admin') : navigateUser('/game')
-                    return true;
-                }else{
-                    return JSON.stringify(response)
-                }
-            })
+    const login = async (data) => {
+        try {
+            const res = await fetch(PROCESSURL + 'login', { 
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json',
+                    csrf: data.csrf
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const response = await res.json();
+    
+            if (response.loggedIn) {
+                setAdmin(response.adminLoggedIn)
+                setAuthentication(true)
+                setUserId(response.userId)
+                setUserFirstName(response.userFirstName)
+                response.adminLoggedIn ? navigateUser('/admin') : navigateUser('/game')
+                return true
+            } else {
+                return JSON.stringify(response)
+            }
+        } catch (error) {
+            return false
+        }
     }
+    
 
     const logout = () => {
         fetch(PROCESSURL + 'logout', { 
@@ -57,7 +77,7 @@ const AuthProvider = ({ children }) => {
             })
     }
 
-    return <AuthContext.Provider value={{ isAuthenticated, isAdmin, login, logout }}>{children}</AuthContext.Provider>
+    return <AuthContext.Provider value={{ isAuthenticated, isAdmin, userId, userFirstName, login, logout }}>{children}</AuthContext.Provider>
 
 }
 

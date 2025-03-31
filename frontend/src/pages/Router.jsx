@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import AuthProvider from "../functions/AuthProvider"
+import ExpressServicesProvider from "../functions/ExpressServicesProvider";
 import ProtectedRoutes from "../components/ProtectedRoutes"
 import ProtectedAdminRoutes from "../components/ProtectedAdminRoutes"
 import Layout from "../components/Layout"
@@ -13,18 +14,20 @@ const Router = () => {
     return(
         <BrowserRouter>
             <AuthProvider>
-            <Routes>
-                <Route path="/" element={ <Layout /> }>
-                    <Route index element={ <Login /> }/>
-                    <Route element={<ProtectedRoutes />}>
-                        <Route path="/game" element={<Game />} />
-                    </Route>
-                    <Route element={<ProtectedAdminRoutes />}>
-                        <Route path="/admin/*" element={<Admin />} />
-                    </Route>
-                    <Route path="*" element={ <Page404/> }/>
-                </Route>
-            </Routes>
+                <ExpressServicesProvider>
+                    <Routes>
+                        <Route path="/" element={ <Layout /> }>
+                            <Route index element={ <Login /> }/>
+                            <Route element={<ProtectedRoutes />}>
+                                <Route path="/game" element={<Game />} />
+                            </Route>
+                            <Route element={<ProtectedAdminRoutes />}>
+                                <Route path="/admin/*" element={<Admin />} />
+                            </Route>
+                            <Route path="*" element={ <Page404/> }/>
+                        </Route>
+                    </Routes>
+                </ExpressServicesProvider>
             </AuthProvider>
         </BrowserRouter>
     )

@@ -3,6 +3,7 @@ import { Link, Route, Routes, useNavigate } from "react-router-dom"
 import { useAuth } from "../functions/AuthProvider"
 
 import Classrooms from "./admin/Classrooms"
+import Classroom from "./admin/Classroom"
 import Assignments from "./admin/Assignments"
 import Games from "./admin/Games"
 
@@ -59,6 +60,7 @@ const Admin = () => {
             <div style={{ padding: '20px' }}>
                 <Routes>
                     <Route path="/" element={<Classrooms />} />
+                    <Route path="classroom/*" element={<Classroom />} />
                     <Route path="assignments" element={<Assignments />} />
                     <Route path="games" element={<Games />} />
                 </Routes>
