@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 
 import TestGame from "./games/TestGame"
 import GrocerySelection from "./games/GrocerySelection"
+import BobCleans from "./games/BobCleans"
 
 const Egg = ({ position, is_colliding, game, onScore }) => {
 
@@ -30,8 +31,8 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
                 return <p>NO GAMES ATTACHED</p>
             case 'Grocery Store':
                 return <GrocerySelection onScoreSubmission={handleScoreSubmission}></GrocerySelection>
-            case 'Game Three':
-                return <TestGame onScoreSubmission={handleScoreSubmission} />
+            case 'Bob Cleans':
+                return <BobCleans onScoreSubmission={handleScoreSubmission}></BobCleans>
             default:
                 return null
         }
