@@ -7,7 +7,7 @@ const postCreateClassroom = async (req, res) => {
             if(creation.status === true){
                 res.json({ status: true, error: false })
             }else{
-                res.json({accountCreated: false, error: creation.error})
+                res.json({status: false, error: creation.error})
             }
         }
     }

@@ -102,7 +102,7 @@ const Classrooms = () => {
 
     return (
         <div>
-            <h2>Current Classrooms</h2>
+            <h2>All Classrooms</h2>
 
             <button style={buttonStyle} onClick={() => setShowPopup(true)}>Create New Classroom</button>
             <br/>
@@ -163,7 +163,7 @@ const Classrooms = () => {
                                 <button
                                     type="button"
                                     onClick={() => { setShowPopup(false); setErrors({ processing: false, success: false }) }}
-                                    style={buttonStyle}
+                                    style={{...buttonStyle, backgroundColor:'#dd0000'}}
                                 >
                                     Cancel
                                 </button>
@@ -194,7 +194,7 @@ const Classrooms = () => {
                                 <button style={buttonStyle} 
                                 onClick={() => {navigate(`classroom?classroomName=${classroom.name}&classroom=${classroom._id}`)}} >Access Classroom</button>
                                 {classroom.students_count === 0 && (
-                                    <button style={deleteButtonStyle} onClick={() => {handleDelete(classroom._id)}}>Delete</button>
+                                    <button style={{...buttonStyle, backgroundColor:'#dd0000'}} onClick={() => {handleDelete(classroom._id)}}>Delete</button>
                                 )}
                             </td>
                         </tr>
@@ -243,18 +243,5 @@ const buttonStyle = {
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
 }
-
-const deleteButtonStyle = {
-    padding: '5px 15px',
-    margin: '5px',
-    border: 'none',
-    borderRadius: '4px',
-    backgroundColor: '#dd0000',
-    color: '#fff',
-    fontSize: '14px',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
-}
-
 
 export default Classrooms

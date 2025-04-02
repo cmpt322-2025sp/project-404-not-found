@@ -12,5 +12,8 @@ router.post('/delete_classroom',controller.postDeleteClassroom)
 router.post('/upload_classroom_csv',controller.postUploadClassroomCSV)
 router.post('/retrieve_students',controller.postRetrieveStudents)
 router.post('/add_student',controller.postAddStudent)
+router.post('/create_assignment',controller.postCreateAssignment)
+router.post('/retrieve_assignments',controller.postRetrieveAssignments)
+router.get('/check_assignment_exists',controller.getAssignment)
 
 module.exports = router;

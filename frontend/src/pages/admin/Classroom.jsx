@@ -302,7 +302,7 @@ const Classroom = () => {
                                         setFormData({}); 
                                         setErrors({ processing: false, success: false });
                                     }}
-                                    style={buttonStyle}
+                                    style={{...buttonStyle, backgroundColor:'#dd0000'}}
                                 >
                                     Cancel
                                 </button>
