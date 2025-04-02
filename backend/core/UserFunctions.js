@@ -1,5 +1,4 @@
 const { InsertDocument, FindDocument, UpdateDocument } = require("./DatabaseFunctions")
-// const crypto = require('crypto');
 
 const loginUser = async (email, password) => {
     const user = await FindDocument('users', {email: email}, 'student_id first_name')
@@ -40,9 +39,15 @@ const createStudent = async (student_first_name, student_last_name, student_id, 
     return user ? true : false
 }
 
+const createAssignment = async (assignment_name, assignment_class, assignment_due_date) => {
+    const assignment = await InsertDocument('assignments', {name: assignment_name, class_id: assignment_class, due_date: assignment_due_date})
+    return assignment ? { status: true, id: assignment } : { status: false, error: 'Assignment creation failed' }
+}
+
 module.exports = {
     loginUser,
     createClassroom,
     updateStudentsCount,
     createStudent,
+    createAssignment
 }

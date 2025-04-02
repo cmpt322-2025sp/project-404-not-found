@@ -27,7 +27,7 @@ const Logout = () => {
                 Logout
             </button>
             { isAdmin && 
-                <Link to="/admin">
+                <Link to="/admin/">
                     <button
                         style={{
                             backgroundColor: '#4CAF50',
