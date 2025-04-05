@@ -7,6 +7,7 @@ import Layout from "../components/Layout"
 import Page404 from "./Page404"
 
 import Game from "./Game"
+import Assignments from "./Assignments"
 import Login from "./Login"
 import Admin from "./Admin"
 
@@ -20,6 +21,7 @@ const Router = () => {
                             <Route index element={ <Login /> }/>
                             <Route element={<ProtectedRoutes />}>
                                 <Route path="/game" element={<Game />} />
+                                <Route path="/assignments" element={<Assignments />} />
                             </Route>
                             <Route element={<ProtectedAdminRoutes />}>
                                 <Route path="/admin/*" element={<Admin />} />

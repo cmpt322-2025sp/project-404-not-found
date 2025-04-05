@@ -54,7 +54,7 @@ const AuthProvider = ({ children }) => {
                 setAuthentication(true)
                 setUserId(response.userId)
                 setUserFirstName(response.userFirstName)
-                response.adminLoggedIn ? navigateUser('/admin') : navigateUser('/game')
+                response.adminLoggedIn ? navigateUser('/admin/') : navigateUser('/assignments/')
                 return true
             } else {
                 return JSON.stringify(response)

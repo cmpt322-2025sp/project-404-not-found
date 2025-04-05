@@ -4,10 +4,26 @@ import red_island from "../asset/images/red_island.png"
 import yellow_island from "../asset/images/yellow_island.png"
 import { island_positions } from "../Const"
 
-const Playground = ({ children }) => {
+const Playground = ({ assignment, children }) => {
     return (
         <div style={playgroundWrapperStyle}>
             <div style={playgroundStyle}>
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%', alignItems: 'center' }}>
+                <h2 style={{
+                    fontFamily: 'Comic Sans MS, sans-serif',
+                    fontSize: '20px',
+                    color: 'purple',
+                    textShadow: '2px 2px 10px rgba(255, 0, 255, 0.8)',
+                    letterSpacing: '2px',
+                    animation: 'bounce 1.5s infinite',
+                    backgroundColor: '#FFEB3B',
+                    padding: '15px',
+                    borderRadius: '15px',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+                }}>
+                    {assignment}
+                </h2>
+            </div>
                 <img
                     id="greenIsland"
                     src={green_island}

@@ -3,7 +3,7 @@ import { PROCESSURL } from "../Const"
 import { useAuth } from "../functions/AuthProvider"
 
 const LoginForm = () => {
-    const[csrf, setCSRF] = useState('');
+    const [csrf, setCSRF] = useState('');
     const [formData, setFormData] = useState({});
     const [errors, setErrors] = useState({});
     const auth = useAuth();
@@ -22,7 +22,7 @@ const LoginForm = () => {
     const handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.value;
-        setFormData(values => ({...values, [name]: value}))
+        setFormData(values => ({ ...values, [name]: value }))
     }
 
     const handleSubmit = (event) => {
@@ -34,100 +34,170 @@ const LoginForm = () => {
         auth.login(formData)
             .then((result) => {
                 result = JSON.parse(result);
-                if(result.error){
-                    setErrors(({server_1: result.error}))
+                if (result.error) {
+                    setErrors(({ server_1: result.error }))
                 }
             })
     }
 
-    return(
+    return (
         <div style={{
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            minHeight: '100vh', 
-            backgroundColor: '#f4f7fc',
-            fontFamily: 'Arial, sans-serif'
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100vw',
+            height: '100vh',
+            background: 'linear-gradient(120deg, #ff8c00, #00b3b3)',
+            fontFamily: "'Comic Sans MS', 'Arial', sans-serif",
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            overflow: 'hidden'
         }}>
-            <form 
-                onSubmit={handleSubmit} 
+            <div style={{
+                position: 'absolute', width: '180px', height: '180px',
+                backgroundColor: '#ff6666', borderRadius: '50%',
+                top: '10%', left: '10%', opacity: 0.8,
+                animation: 'floatUp 4s infinite alternate ease-in-out'
+            }}></div>
+
+            <div style={{
+                position: 'absolute', width: '140px', height: '140px',
+                backgroundColor: '#66ccff', borderRadius: '50%',
+                bottom: '10%', right: '10%', opacity: 0.8,
+                animation: 'floatDown 4s infinite alternate ease-in-out'
+            }}></div>
+
+            <form
+                onSubmit={handleSubmit}
                 style={{
                     backgroundColor: '#fff',
-                    padding: '30px',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                    width: '100%',
-                    maxWidth: '400px',
-                    textAlign: 'center'
+                    padding: '40px',
+                    borderRadius: '20px',
+                    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+                    width: '400px',
+                    textAlign: 'center',
+                    position: 'relative',
+                    animation: 'popIn 1s ease-out'
                 }}
             >
-                <h2 style={{ color: '#007bff', fontSize: '24px', marginBottom: '20px' }}>Bob's Math Adventure</h2>
-                <h3 style={{ fontSize: '18px', color: '#333', marginBottom: '15px' }}>Welcome! Please log in below.</h3>
+                <h2 style={{
+                    color: '#ff4d4d',
+                    fontSize: '28px',
+                    marginBottom: '15px',
+                    textShadow: '2px 2px 0px #ffcc00',
+                    animation: 'bounce 1.5s infinite'
+                }}>🎮 Bob's Math Adventure 🚀</h2>
+
+                <h3 style={{
+                    fontSize: '18px',
+                    color: '#333',
+                    marginBottom: '20px',
+                    backgroundColor: '#66ccff',
+                    padding: '8px',
+                    borderRadius: '8px',
+                    display: 'inline-block'
+                }}>Welcome! Enter to Play 🎲</h3>
 
                 {errors.server_1 && (
                     <p style={{ color: 'red', fontSize: '14px', marginBottom: '15px' }}>
                         {errors.server_1}
                     </p>
                 )}
-                
-                <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="email" style={{ fontSize: '14px', color: '#333', display: 'block', marginBottom: '5px' }}>Email</label>
-                    <input 
+
+                <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+                    <input
                         type="email"
                         name="email"
                         id="email"
-                        required="required"
+                        required
                         value={formData.email || ""}
                         onChange={handleChange}
                         style={{
-                            width: '100%', 
-                            padding: '10px', 
-                            border: '1px solid #ccc', 
-                            borderRadius: '4px', 
-                            fontSize: '16px'
+                            width: '85%',
+                            padding: '12px',
+                            border: '3px solid #66ccff',
+                            borderRadius: '12px',
+                            fontSize: '16px',
+                            backgroundColor: '#e6f7ff',
+                            textAlign: 'center',
+                            display: 'block',
+                            margin: 'auto'
                         }}
-                        placeholder="bob@westminsterelementary.edu"
+                        placeholder="📧 Your Email"
                     />
                 </div>
 
-                <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="password" style={{ fontSize: '14px', color: '#333', display: 'block', marginBottom: '5px' }}>Password</label>
-                    <input 
+                <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+                    <input
                         type="password"
                         name="password"
                         id="password"
-                        required="required"
+                        required
                         value={formData.password || ""}
                         onChange={handleChange}
                         style={{
-                            width: '100%', 
-                            padding: '10px', 
-                            border: '1px solid #ccc', 
-                            borderRadius: '4px', 
-                            fontSize: '16px'
+                            width: '85%',
+                            padding: '12px',
+                            border: '3px solid #ffcc00',
+                            borderRadius: '12px',
+                            fontSize: '16px',
+                            backgroundColor: '#fffbe6',
+                            textAlign: 'center',
+                            display: 'block',
+                            margin: 'auto'
                         }}
-                        placeholder="**********"
+                        placeholder="🔑 Your Password"
                     />
                 </div>
 
-                <div style={{ marginBottom: '15px' }}>
-                    <input 
-                        type="submit" 
-                        value="Login" 
+                <div>
+                    <input
+                        type="submit"
+                        value="🎉 Start Playing!"
                         style={{
-                            width: '100%', 
-                            padding: '10px', 
-                            border: 'none', 
-                            backgroundColor: '#007bff', 
-                            color: '#fff', 
-                            borderRadius: '4px', 
-                            fontSize: '16px', 
+                            width: '85%',
+                            padding: '12px',
+                            border: 'none',
+                            backgroundColor: '#ff4d4d',
+                            color: '#fff',
+                            borderRadius: '12px',
+                            fontSize: '18px',
                             cursor: 'pointer',
-                            transition: 'background-color 0.3s'
+                            transition: 'transform 0.2s ease',
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                            display: 'block',
+                            margin: 'auto'
                         }}
+                        onMouseOver={(e) => e.target.style.transform = 'scale(1.1)'}
+                        onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
                     />
                 </div>
             </form>
+
+            <style>
+                {`
+                    @keyframes popIn {
+                        0% { transform: scale(0.8); opacity: 0; }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+                    
+                    @keyframes bounce {
+                        0%, 100% { transform: translateY(0); }
+                        50% { transform: translateY(-8px); }
+                    }
+
+                    @keyframes floatUp {
+                        0% { transform: translateY(0); }
+                        100% { transform: translateY(-20px); }
+                    }
+
+                    @keyframes floatDown {
+                        0% { transform: translateY(0); }
+                        100% { transform: translateY(20px); }
+                    }
+                `}
+            </style>
         </div>
     )
 }

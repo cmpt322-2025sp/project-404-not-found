@@ -26,7 +26,7 @@ const Logout = () => {
             >
                 Logout
             </button>
-            { isAdmin && 
+            { isAdmin ? (
                 <Link to="/admin/">
                     <button
                         style={{
@@ -44,7 +44,25 @@ const Logout = () => {
                         Admin
                     </button>
                 </Link>
-            }
+            ) : (
+                <Link to="/assignments/">
+                    <button
+                        style={{
+                            backgroundColor: '#4CAF50',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '0.25rem',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.3s ease',
+                            marginLeft: '10px',
+                        }}
+                        onMouseOver={(e) => e.target.style.backgroundColor = '#45a049'}
+                        onMouseOut={(e) => e.target.style.backgroundColor = '#4CAF50'}
+                    >
+                        Assignments
+                    </button>
+                </Link>
+            )}
         </div>
     );
 };

@@ -165,6 +165,26 @@ const ExpressServicesProvider = ({ children }) =>{
         })
     }
 
+    const retrieveStudentAssignments = (data) => {
+        return fetch(PROCESSURL + 'retrieve_student_assignments', { 
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                csrf: data.csrf
+            },
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return response.assignments
+            }else{
+                return JSON.stringify(response)
+            }
+        })
+    }
+
     return (
         <ExpressServicesContext.Provider value={{ 
             createClassroom, 
@@ -174,7 +194,8 @@ const ExpressServicesProvider = ({ children }) =>{
             deleteClassroom, 
             addStudent,
             createAssignment,
-            retrieveAssignments
+            retrieveAssignments,
+            retrieveStudentAssignments
         }}>{children}</ExpressServicesContext.Provider>
     );
 

@@ -15,5 +15,7 @@ router.post('/add_student',controller.postAddStudent)
 router.post('/create_assignment',controller.postCreateAssignment)
 router.post('/retrieve_assignments',controller.postRetrieveAssignments)
 router.get('/check_assignment_exists',controller.getAssignment)
+router.post('/retrieve_student_assignments',controller.postRetrieveStudentAssignments)
+router.get('/check_assignment_exists_for_student',controller.getAssignmentExists)
 
 module.exports = router;
