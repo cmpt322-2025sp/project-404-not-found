@@ -1,5 +1,7 @@
-// import TestGame from "./components/games/TestGame";
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from "../functions/AuthProvider"
+import { PROCESSURL } from "../Const"
 import Playground from "../components/Playground"
 import Character from "../components/Character"
 import Egg from "../components/Egg"
@@ -7,6 +9,31 @@ import ProgressBar from "../components/ProgressBar"
 import { character_speed, character_dimension, character_initial_position, island_positions } from "../Const"
 
 const Game = () => {
+
+    const navigate = useNavigate()
+    const location = useLocation()
+    const queryParams = new URLSearchParams(location.search)
+
+    const urlRefAssignmentName = queryParams.get('assignment')
+    const urlRefAssignmentId = queryParams.get('assignmentRef')
+    const urlRefClassroomId = queryParams.get('classroom')
+    const { userId } = useAuth()
+
+    if(!urlRefAssignmentName || !urlRefAssignmentId || !urlRefClassroomId){
+        navigate('/assignments')
+    }
+
+    useEffect(() => {
+        fetch(PROCESSURL + 'check_assignment_exists_for_student?user_id='+userId+'&'+queryParams, { method: 'GET', credentials: "include" })
+            .then((res) => res.json())
+            .then((assignment) => {
+                if(!assignment.exists){
+                    navigate('/assignments')
+                }
+            })
+
+    }, [navigate])
+
     // Score Data
     const [scores, setScores] = useState({
         "Game One": 40,
@@ -99,7 +126,7 @@ const Game = () => {
     }
 
     return (
-        <Playground>
+        <Playground assignment={urlRefAssignmentName}>
             <Character position={character_position} movePlayer={movePlayer} ></Character>
             {scores["Game One"] === 0 && (
                 <Egg position={object_1_position} is_colliding={is_colliding_1} game="Game One" onScore={handleScoreFromEgg} />

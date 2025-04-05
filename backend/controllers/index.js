@@ -5,6 +5,7 @@ module.exports = {
     getLogout   : require('./getLogout'),
     getClassroom : require('./getClassroom'),
     getAssignment : require('./getAssignment'),
+    getAssignmentExists : require('./getAssignmentExists'),
     postCreateClassroom : require('./postCreateClassroom'),
     postRetrieveClassrooms : require('./postRetrieveClassrooms'),
     postDeleteClassroom: require('./postDeleteClassroom'),
@@ -13,5 +14,6 @@ module.exports = {
     postAddStudent: require('./postAddStudent'),
     postCreateAssignment: require('./postCreateAssignment'),
     postRetrieveAssignments: require('./postRetrieveAssignments'),
+    postRetrieveStudentAssignments: require('./postRetrieveStudentAssignments'),
 
 }
