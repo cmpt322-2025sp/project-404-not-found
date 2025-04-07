@@ -2,6 +2,12 @@ import React from "react"
 import green_island from "../asset/images/green_island.png"
 import red_island from "../asset/images/red_island.png"
 import yellow_island from "../asset/images/yellow_island.png"
+
+import tree from "../asset/images/tree.png"
+import house from "../asset/images/house.png"
+import store from "../asset/images/store.png"
+
+import bg from "../asset/images/playground.png"
 import { island_positions } from "../Const"
 
 const Playground = ({ assignment, children }) => {
@@ -29,21 +35,57 @@ const Playground = ({ assignment, children }) => {
                     src={green_island}
                     alt="Green Island"
                     className="island-image"
-                    style={{ top: `${island_positions.greenIsland.top}vh`, left: `${island_positions.greenIsland.left}vw` }}
+                    style={{ bottom: `5%`, left: `0%` }}
                 />
                 <img
                     id="redIsland"
                     src={red_island}
                     alt="Red Island"
                     className="island-image"
-                    style={{ top: `${island_positions.redIsland.top}vh`, left: `${island_positions.redIsland.left}vw` }}
+                    style={{ top: `40%`, right: `22%` }}
                 />
                 <img
                     id="yellowIsland"
                     src={yellow_island}
                     alt="Yellow Island"
                     className="island-image"
-                    style={{ top: `${island_positions.yellowIsland.top}vh`, left: `${island_positions.yellowIsland.left}vw` }}
+                    style={{ bottom: `14%`, left: `58%` }}
+                />
+                <img
+                    id="house"
+                    src={house}
+                    alt="House"
+                    style={{
+                        position: "absolute",
+                        top: "63%",
+                        left: "40%",
+                        width: "9vw",
+                        height: "auto",
+                    }}
+                />
+                <img
+                    id="store"
+                    src={store}
+                    alt="Store"
+                    style={{
+                        position: "absolute",
+                        bottom: "74%",
+                        right: "77%",
+                        width: "6vw",
+                        height: "auto",
+                    }}
+                />
+                <img
+                    id="tree"
+                    src={tree}
+                    alt="Tree"
+                    style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "75%",
+                        width: "11vw",
+                        height: "auto",
+                    }}
                 />
                 {children}
             </div>
@@ -60,23 +102,23 @@ const playgroundWrapperStyle = {
 };
 
 const playgroundStyle = {
-    position: "relative",
+    position: "absolute",
     width: "100%",
     height: "100%",
+    fontFamily: "'Comic Sans MS', cursive",
+    margin: 0,
+    backgroundImage: `url(${bg})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
     overflow: "hidden",
-    background: `repeating-linear-gradient(45deg, 
-        #6b8e23, 
-        #6b8e23 10px, 
-        #8b9b24 10px, 
-        #8b9b24 20px)`,
-    backgroundSize: "9px 9px"
 };
 
 const style = `
     .island-image {
         width: 40vw;
         height: auto;
-        position: absolute;
+        position: relative;
         filter: "drop-shadow(0px 40px 60px rgba(0, 0, 0, 1)) drop-shadow(0px 30px 50px rgba(0, 0, 0, 1))",
     }
 `;
