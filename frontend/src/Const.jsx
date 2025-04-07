@@ -3,7 +3,7 @@ const character_dimension = 150
 const character_initial_position = { top: 450, left: 900 }
 const egg_dimension = 120
 
-const island_positions = {"greenIsland":{top:1,left:1}, "redIsland":{top:20,left:60}, "yellowIsland":{top:40,left:20}}
+const island_positions = {"greenIsland":{top:1,left:1}, "redIsland":{top:50,left:60}, "yellowIsland":{top:40,left:20}}
 
 const PROCESSURL = process.env.REACT_APP_PROCESSURL;
 

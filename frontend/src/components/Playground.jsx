@@ -2,11 +2,9 @@ import React from "react"
 import green_island from "../asset/images/green_island.png"
 import red_island from "../asset/images/red_island.png"
 import yellow_island from "../asset/images/yellow_island.png"
-
 import tree from "../asset/images/tree.png"
 import house from "../asset/images/house.png"
 import store from "../asset/images/store.png"
-
 import bg from "../asset/images/playground.png"
 import { island_positions } from "../Const"
 
@@ -35,21 +33,21 @@ const Playground = ({ assignment, children }) => {
                     src={green_island}
                     alt="Green Island"
                     className="island-image"
-                    style={{ bottom: `5%`, left: `0%` }}
+                    style={{ top: `${island_positions.greenIsland.top}vh`, left: `${island_positions.greenIsland.left}vw` }}
                 />
                 <img
                     id="redIsland"
                     src={red_island}
                     alt="Red Island"
                     className="island-image"
-                    style={{ top: `40%`, right: `22%` }}
+                    style={{ top: `${island_positions.redIsland.top}vh`, left: `${island_positions.redIsland.left}vw` }}
                 />
                 <img
                     id="yellowIsland"
                     src={yellow_island}
                     alt="Yellow Island"
                     className="island-image"
-                    style={{ bottom: `14%`, left: `58%` }}
+                    style={{ top: `${island_positions.yellowIsland.top}vh`, left: `${island_positions.yellowIsland.left}vw` }}
                 />
                 <img
                     id="house"
@@ -81,7 +79,7 @@ const Playground = ({ assignment, children }) => {
                     alt="Tree"
                     style={{
                         position: "absolute",
-                        top: "50%",
+                        top: "60%",
                         left: "75%",
                         width: "11vw",
                         height: "auto",
@@ -102,7 +100,7 @@ const playgroundWrapperStyle = {
 };
 
 const playgroundStyle = {
-    position: "absolute",
+    position: "relative",
     width: "100%",
     height: "100%",
     fontFamily: "'Comic Sans MS', cursive",
@@ -118,7 +116,7 @@ const style = `
     .island-image {
         width: 40vw;
         height: auto;
-        position: relative;
+        position: absolute;
         filter: "drop-shadow(0px 40px 60px rgba(0, 0, 0, 1)) drop-shadow(0px 30px 50px rgba(0, 0, 0, 1))",
     }
 `;

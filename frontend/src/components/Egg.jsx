@@ -3,10 +3,8 @@ import EggObject from "../asset/images/egg_object.png"
 import { egg_dimension } from "../Const"
 import Modal from 'react-modal';
 
-// Import your individual background images
 import toyBackground from "../asset/images/kidtoysbg.jpg"
 import groceryBackground from "../asset/images/grocerybg.jpg"
-// import bobSortingBackground from "../asset/images/bobsortingbg.jpg"
 
 // Game components
 import TestGame from "./games/TestGame"
@@ -16,14 +14,12 @@ import BobCleans from "./games/BobCleans"
 const Egg = ({ position, is_colliding, game, onScore }) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false)
 
-    // Helper function to return the appropriate background image
     const getBackgroundByGame = (gameName) => {
         switch (gameName) {
             case 'Grocery Store':
                 return groceryBackground
-            case "Toy Sorting":
-                // return bobSortingBackground
-            // Add other cases if you have more games...
+            case "Bob Cleans":
+                return toyBackground
             default:
                 return toyBackground
         }
@@ -49,7 +45,7 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
                 return <p>NO GAMES ATTACHED</p>
             case 'Grocery Store':
                 return <GrocerySelection onScoreSubmission={handleScoreSubmission} />
-            case "Toy Sorting":
+            case "Bob Cleans":
                 return <BobCleans onScoreSubmission={handleScoreSubmission} />
             default:
                 return null
@@ -75,7 +71,6 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
 
     return (
         <>
-            {/* The small "Play" pop-up when the user collides */}
             <div style={containerStyle}>
                 <div style={{
                     fontSize: '20px',
@@ -106,7 +101,6 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
                 </button>
             </div>
 
-            {/* The Egg image itself */}
             <img
                 src={EggObject}
                 alt="Egg"
@@ -122,7 +116,6 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
                 }}
             />
 
-            {/* Modal for the game */}
             <Modal
                 isOpen={isPopupOpen}
                 onRequestClose={handleClosePopup}

@@ -38,7 +38,7 @@ const Game = () => {
     const [scores, setScores] = useState({
         "Game One": 40,
         "Grocery Store": 0,
-        "Game Three": 0
+        "Bob Cleans": 0
     })
     const handleScoreFromEgg = (game, score) => {
         setScores((prevScores) => ({
@@ -134,8 +134,8 @@ const Game = () => {
             {scores["Grocery Store"] === 0 && (
                 <Egg position={object_2_position} is_colliding={is_colliding_2} game="Grocery Store" onScore={handleScoreFromEgg} />
             )}
-            {scores["Game Three"] === 0 && (
-                <Egg position={object_3_position} is_colliding={is_colliding_3} game="Game Three" onScore={handleScoreFromEgg} />
+            {scores["Bob Cleans"] === 0 && (
+                <Egg position={object_3_position} is_colliding={is_colliding_3} game="Bob Cleans" onScore={handleScoreFromEgg} />
             )}
             <ProgressBar scores={scores}></ProgressBar>
         </Playground>
