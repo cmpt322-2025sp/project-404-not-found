@@ -73,6 +73,10 @@ export default function GrocerySelection({ onScoreSubmission }) {
         correctAnswer: newX + newY,
         emoji: newEmoji,
       });
+      if(circles[count] !== ' 🟡'){
+        circles[count] = ' 🟢';  
+        setCircles([...circles]);
+      }
 
     } else {
       // Mark this attempt's circle as 🟡
