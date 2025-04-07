@@ -44,6 +44,7 @@ const Bob = (props) => {
             }));
         };
 
+        
         // Set up the interval to move Bob every 20ms
         const intervalId = setInterval(moveBob, 20);
         return () => clearInterval(intervalId); // Clean up the interval on component unmount

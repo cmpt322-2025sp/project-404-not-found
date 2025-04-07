@@ -11,7 +11,7 @@ import pink from "../../asset/images/balloons/pink.png";
 const Balloon = (props) => {
     const balloons = [red, orange, yellow, green, blue, darkblue, purple, pink];
     const [balloonIndex] = useState(() => Math.floor(Math.random() * balloons.length));
-    
+    const [correct, setCorrect] = useState(false);
     // State for the y-position of the balloon
     const [newY, setNewY] = useState(5);
     const [stasisY] = useState(5);
@@ -32,16 +32,16 @@ const Balloon = (props) => {
         const interval = setInterval(() => {
             if(bobOnBalloon){
                 if (newY < 40) { // Adjust when to stop updating
-                    setNewY(prevY => prevY + 0.08); // Increment Y-position
+                    setNewY(prevY => prevY + 0.05); // Increment Y-position
                     // console.log(newY);
+                } else {
+                    props.gameOver();
                 }
-                // else {
-                //     setNewY(stasisY);
-                // }
             }
             else {
                 if (newY > stasisY) { // Adjust when to stop updating
-                    setNewY(prevY => prevY - 0.4); // Increment Y-position
+                    setNewY(prevY => prevY - 0.5); // Increment Y-position
+                    setCorrect(true);
                 }
             }
         }, 20 );
@@ -57,7 +57,7 @@ const Balloon = (props) => {
                 backgroundPosition: "center",
                 height: "354px",
                 width: "125px",
-                left: props.left,
+                left: props.left + "%",
                 top: newY + "%",
                 display: "flex",
                 alignItems: "center",
@@ -67,11 +67,9 @@ const Balloon = (props) => {
                 fontSize: "24px"
             }}
         >
-            <h1 style={{ 
-                position: "absolute", fontSize: "30px" , top: "10%", left: "25%"}}>{originalX} - {originalY}</h1>
-            {/* {end && <h1 style={{ position: "absolute", fontSize: "30px" , top: "10%", left: "35%"}}>✅</h1>}
-            {death && <h1 style={{ position: "absolute", fontSize: "30px" , top: "10%", left: "25%"}} >❌</h1>} */}
-        </div>
+           {!correct && <h1 style={{  position: "absolute", fontSize: "30px" , top: "10%", left: "25%"}}>{originalX} - {originalY}</h1>}
+           {correct && <h1 style={{ position: "absolute", fontSize: "30px" , top: "10%", left: "35%"}}>✅</h1>}
+              </div>
     );
 };
 
