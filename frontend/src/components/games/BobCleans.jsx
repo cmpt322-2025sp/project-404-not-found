@@ -159,8 +159,8 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
 
-  const [toyX, setToyX] = useState("45%");
-  const [toyY, setToyY] = useState("35%");
+  const [toyX, setToyX] = useState("48%");
+  const [toyY, setToyY] = useState("270px");
 
   const gameOver = currentIndex >= toyQuestions.length;
 
@@ -184,13 +184,13 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
     let targetY = "0px";
     if (boxType === "ones") {
       targetX = "25%";
-      targetY = "50%";
+      targetY = "400px";
     } else if (boxType === "tens") {
       targetX = "50%";
-      targetY = "50%";
+      targetY = "300px";
     } else if (boxType === "hundreds") {
       targetX = "70%";
-      targetY = "50%";
+      targetY = "350px";
     }
 
     setToyX(targetX);
@@ -219,8 +219,8 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
     // Move on after 1 second
     setTimeout(() => {
       setCurrentIndex((prev) => prev + 1);
-      setToyX("46%");
-      setToyY("35%");
+      setToyX("48%");
+      setToyY("270px");
       setFeedback("");
     }, 1000);
   }
@@ -255,16 +255,20 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
         {gameOver ? (
           <div
             style={{
-              fontFamily: "Fantasy",
-              fontSize: "1.6rem",
+              fontFamily: "'Comic Sans MS', cursive",
+              fontSize: "18px",
               position: "fixed",
               top: "27.4%",
-              left: "41.3%",
+              left: "42%",
               textAlign: "center",
+              display: 'flex',
+              alignItems: 'center',
+              flexDirection: 'column',
+              justifyContent: 'center'
             }}
           >
             <p>All 15 toys have been placed!</p>
-            <p style={{ fontSize: "1.6rem", color: "green" }}>
+            <p style={{ fontSize: "18px", color: "green" }}>
               Final Score: {score} | Grade: {Math.round((score * 100) / 1500)}%
             </p>
             <button
