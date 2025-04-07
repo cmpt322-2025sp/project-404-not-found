@@ -246,7 +246,7 @@ export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
             </>
           )}
 
-          {/* If the game is over, show a "Continue" button (does nothing yet) */}
+          {/* If the game is over, show a "Continue" button */}
           {isGameOver && (
             <button
               style={{
