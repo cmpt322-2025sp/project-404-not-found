@@ -2,12 +2,32 @@ import React from "react"
 import green_island from "../asset/images/green_island.png"
 import red_island from "../asset/images/red_island.png"
 import yellow_island from "../asset/images/yellow_island.png"
+import tree from "../asset/images/tree.png"
+import house from "../asset/images/house.png"
+import store from "../asset/images/store.png"
+import bg from "../asset/images/playground.png"
 import { island_positions } from "../Const"
 
-const Playground = ({ children }) => {
+const Playground = ({ assignment, children }) => {
     return (
         <div style={playgroundWrapperStyle}>
             <div style={playgroundStyle}>
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%', alignItems: 'center' }}>
+                <h2 style={{
+                    fontFamily: 'Comic Sans MS, sans-serif',
+                    fontSize: '20px',
+                    color: 'purple',
+                    textShadow: '2px 2px 10px rgba(255, 0, 255, 0.8)',
+                    letterSpacing: '2px',
+                    animation: 'bounce 1.5s infinite',
+                    backgroundColor: '#FFEB3B',
+                    padding: '15px',
+                    borderRadius: '15px',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+                }}>
+                    {assignment}
+                </h2>
+            </div>
                 <img
                     id="greenIsland"
                     src={green_island}
@@ -29,6 +49,42 @@ const Playground = ({ children }) => {
                     className="island-image"
                     style={{ top: `${island_positions.yellowIsland.top}vh`, left: `${island_positions.yellowIsland.left}vw` }}
                 />
+                <img
+                    id="house"
+                    src={house}
+                    alt="House"
+                    style={{
+                        position: "absolute",
+                        top: "63%",
+                        left: "40%",
+                        width: "9vw",
+                        height: "auto",
+                    }}
+                />
+                <img
+                    id="store"
+                    src={store}
+                    alt="Store"
+                    style={{
+                        position: "absolute",
+                        bottom: "74%",
+                        right: "77%",
+                        width: "6vw",
+                        height: "auto",
+                    }}
+                />
+                <img
+                    id="tree"
+                    src={tree}
+                    alt="Tree"
+                    style={{
+                        position: "absolute",
+                        top: "60%",
+                        left: "75%",
+                        width: "11vw",
+                        height: "auto",
+                    }}
+                />
                 {children}
             </div>
         </div>
@@ -47,13 +103,13 @@ const playgroundStyle = {
     position: "relative",
     width: "100%",
     height: "100%",
+    fontFamily: "'Comic Sans MS', cursive",
+    margin: 0,
+    backgroundImage: `url(${bg})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
     overflow: "hidden",
-    background: `repeating-linear-gradient(45deg, 
-        #6b8e23, 
-        #6b8e23 10px, 
-        #8b9b24 10px, 
-        #8b9b24 20px)`,
-    backgroundSize: "9px 9px"
 };
 
 const style = `

@@ -6,25 +6,41 @@ import Question from "./Question";
 import GroceryCheckout from "./GroceryCheckout";
 
 export default function GrocerySelection({ onScoreSubmission }) {
-  const [count, setCount] = useState(0);
-  const initialX = Math.floor(Math.random() * 11);
-  const initialY = Math.floor(Math.random() * 11);
+  const fruitEmojis = ["🍎", "🍌", "🍊", "🍓", "🍍", "🍉", "🍇", "🍒", "🍑", "🥭"];
+  
+  // We track total attempts - increments after *every* submission (correct or wrong)
+  const [attempt, setAttempt] = useState(0);
 
   const [winner, setWinner] = useState(false);
   const [nextQuestion, setNextQuestion] = useState(false);
   const [prevQuestion, setPrevQuestion] = useState(null);
   const [score, setScore] = useState(1000);
-  const [circles, setCircles] = useState(Array(10).fill("⚫"));
 
+  // Circles for up to 10 attempts:
+  //  - "🟢" for correct
+  //  - "🟡" for wrong
+  //  - "🔴" for skip
+  //  - "⚫" is unused / not yet attempted
+  const [circles, setCircles] = useState(Array(10).fill("⚫"));
+  
   const [showCheckout, setShowCheckout] = useState(false);
 
+  // Generate initial question
+  const initialX = Math.floor(Math.random() * 11);
+  const initialY = Math.floor(Math.random() * 11);
+  const initialEmoji =
+    fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)];
+
+  // objectData includes the current question/emoji
   const [objectData, setObjectData] = useState({
     x: initialX,
     y: initialY,
     color: "white",
     correctAnswer: initialX + initialY,
+    emoji: initialEmoji,
   });
 
+  // Helper to color the score
   const getColor = (s) => {
     if (s <= 500) return "red";
     if (s <= 800) return "orange";
@@ -33,56 +49,68 @@ export default function GrocerySelection({ onScoreSubmission }) {
 
   function handleAnswerCheck(userInput) {
     const numericValue = parseInt(userInput, 10);
+    // Always increment attempt, because the user has tried a submission
+    // but do it at the end, *after* you set circles
+    let wasCorrect = false;
 
     if (numericValue === objectData.correctAnswer) {
-      setCount((prevCount) => prevCount + 1);
+      // Mark this attempt's circle as 🟢
+      setCircles((prev) =>
+        prev.map((c, i) => (i === attempt ? "🟢" : c))
+      );
+      wasCorrect = true;
 
-      if (count >= 9 || score <= 50) {
-        setWinner(true);
-        return;
-      }
-
+      // Prepare next question
       const newX = Math.floor(Math.random() * 11);
       const newY = Math.floor(Math.random() * 11);
+      const newEmoji =
+        fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)];
 
       setObjectData({
         x: newX,
         y: newY,
         color: "white",
         correctAnswer: newX + newY,
+        emoji: newEmoji,
       });
-
-      setCircles((prevCircles) =>
-        prevCircles.map((c, i) => {
-          if (i === count && c!== "🟡") {
-            return "🟢";
-          } else {
-            return c;
-          }
-        })
-      );
 
     } else {
-
-      setObjectData((prev) => ({ ...prev, color: "red" }));
+      // Mark this attempt's circle as 🟡
+      setCircles((prev) =>
+        prev.map((c, i) => (i === attempt ? "🟡" : c))
+      );
+      // Subtract points for each wrong attempt
       setScore((prevScore) => prevScore - 50);
-
-      const nextCircles = circles.map((c, i) => {
-        if (i === count) {
-          return "🟡";
-        } else {
-          return c;
-        }
-      });
-      setCircles(nextCircles)
+      
+      // If you want them to move on to next question even if wrong:
+      //   just generate new question below like we do for correct
+      // If you want them to stay on the same question until correct:
+      //   do nothing special for generating the next question here
+      //
+      // For demonstration, let's keep the same question. The user can keep trying.
+      // So we do NOT change objectData or generate a new one yet.
     }
-  }
 
+    // Now increment attempt
+    setAttempt((prev) => {
+      const newAttempt = prev + 1;
+      // If we've used up 10 attempts or the score is too low:
+      if (newAttempt >= 10 || score <= 50) {
+        setWinner(true);
+      }
+      return newAttempt;
+    });
+  }
 
   if (showCheckout) {
     // Add 1000 to the final score for the next game
     const updatedScore = score + 1000;
-    return <GroceryCheckout previousScore={updatedScore} onScoreSubmission={onScoreSubmission} />;
+    return (
+      <GroceryCheckout
+        previousScore={updatedScore}
+        onScoreSubmission={onScoreSubmission}
+      />
+    );
   }
 
   return (
@@ -98,6 +126,11 @@ export default function GrocerySelection({ onScoreSubmission }) {
         alignItems: "center",
         justifyContent: "space-evenly",
         flexDirection: "column",
+        top: 0,
+        left: 0,
+        padding: "5%",
+        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <div
@@ -113,41 +146,66 @@ export default function GrocerySelection({ onScoreSubmission }) {
         }}
       >
         {!winner && (
-        <button
-          style={{
-            height: "40px",
-            width: "60px",
-            marginLeft: "9%",
-            marginTop: "20%",
-          }}
-          onClick={() => {
-            if (score > 0) {
-              setScore((prev) => prev - 100);
-              setPrevQuestion(objectData.correctAnswer);
-              setNextQuestion(true);
-              handleAnswerCheck(objectData.correctAnswer);
+          <button
+            style={{
+              height: "40px",
+              width: "60px",
+              marginLeft: "9%",
+              marginTop: "20%",
+            }}
+            onClick={() => {
+              // SKIP logic
+              if (score > 0 && attempt < 10) {
+                setScore((prev) => prev - 100);
+                setPrevQuestion(objectData.correctAnswer);
 
-              if (count < 10) {
-
+                // If they skip, we mark the circle as 🔴
                 setCircles((prevCircles) =>
-                  prevCircles.map((c, i) => (i === count ? "🔴" : c))
+                  prevCircles.map((c, i) => (i === attempt ? "🔴" : c))
                 );
+
+                // Move on to next question
+                const newX = Math.floor(Math.random() * 11);
+                const newY = Math.floor(Math.random() * 11);
+                const newEmoji =
+                  fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)];
+
+                setObjectData({
+                  x: newX,
+                  y: newY,
+                  color: "white",
+                  correctAnswer: newX + newY,
+                  emoji: newEmoji,
+                });
+
+                // Show the "prev question" label
+                setNextQuestion(true);
+                setTimeout(() => {
+                  setNextQuestion(false);
+                }, 1000);
+
+                // Advance attempt by 1
+                setAttempt((prev) => {
+                  const newAttempt = prev + 1;
+                  if (newAttempt >= 10 || score <= 50) {
+                    setWinner(true);
+                  }
+                  return newAttempt;
+                });
               }
-              setTimeout(() => {
-                setNextQuestion(false);
-              }, 1000);
-            }
-          }}
-        >
-          SKIP
-        </button>
+            }}
+          >
+            SKIP
+          </button>
         )}
       </div>
 
+      {/* Our question component just displays question & emoji, plus an input */}
       <Question
         x={objectData.x}
         y={objectData.y}
         color={objectData.color}
+        emoji={objectData.emoji}
         onAnswerCheck={handleAnswerCheck}
       />
 
@@ -158,7 +216,7 @@ export default function GrocerySelection({ onScoreSubmission }) {
           position: "absolute",
           marginLeft: "-27%",
           marginTop: "34%",
-          height: "150px",
+          height: "160px",
           width: "350px",
           backgroundColor: "white",
         }}
@@ -170,10 +228,9 @@ export default function GrocerySelection({ onScoreSubmission }) {
             fontFamily: "Impact",
           }}
         >
-          QUESTIONS LEFT: <br />
-          <div key={circles.join("")}>
-            {circles}
-          </div>
+          ATTEMPTS: <br />
+          {/* Show the circles */}
+          <div key={circles.join("")}>{circles}</div>
           <br />
           CURRENT SCORE:
         </p>
@@ -185,9 +242,9 @@ export default function GrocerySelection({ onScoreSubmission }) {
             fontFamily: "Impact",
             color: getColor(score),
           }}
-          key={circles.join("")+"_key_for_score"}
+          key={circles.join("") + "_key_for_score"}
         >
-            {score}
+          {score}
         </p>
       </div>
 
@@ -196,7 +253,7 @@ export default function GrocerySelection({ onScoreSubmission }) {
           style={{
             position: "absolute",
             marginLeft: "-1.5%",
-            marginTop: "-30%",
+            marginTop: "-20%",
             height: "180px",
             width: "300px",
             backgroundColor: "gold",

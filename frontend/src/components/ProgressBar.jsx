@@ -1,4 +1,5 @@
 import React from "react"
+import Logout from "./Logout"
 
 const ProgressBar = ({ scores }) => {
     const totalGames = Object.keys(scores).length
@@ -30,6 +31,8 @@ const ProgressBar = ({ scores }) => {
             <div style={eggStyle}>
                 {eggsRemaining > 0 && `Eggs Remaining: ${"🥚".repeat(eggsRemaining)}`}
             </div>
+            <div style={dividerStyle}></div>
+            <Logout/>
         </div>
     )
 }

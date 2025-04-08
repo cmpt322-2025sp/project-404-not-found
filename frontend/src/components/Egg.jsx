@@ -3,12 +3,28 @@ import EggObject from "../asset/images/egg_object.png"
 import { egg_dimension } from "../Const"
 import Modal from 'react-modal';
 
+import toyBackground from "../asset/images/kidtoysbg.jpg"
+import groceryBackground from "../asset/images/grocerybg.jpg"
+
+// Game components
 import TestGame from "./games/TestGame"
 import GrocerySelection from "./games/GrocerySelection"
+import BobCleans from "./games/BobCleans"
+import DontDrownBob from "./games/DontDrownBob"
 
 const Egg = ({ position, is_colliding, game, onScore }) => {
-
     const [isPopupOpen, setIsPopupOpen] = useState(false)
+
+    const getBackgroundByGame = (gameName) => {
+        switch (gameName) {
+            case 'Grocery Store':
+                return groceryBackground
+            case "Bob Cleans":
+                return toyBackground
+            default:
+                return toyBackground
+        }
+    }
 
     const handlePlayButtonClick = () => {
         setIsPopupOpen(true)
@@ -26,43 +42,48 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
 
     const renderGame = () => {
         switch (game) {
-            case 'Game One':
-                return <p>NO GAMES ATTACHED</p>
+            case 'Dont Drown Bob':
+                return <DontDrownBob onScoreSubmission={handleScoreSubmission} />
             case 'Grocery Store':
-                return <GrocerySelection onScoreSubmission={handleScoreSubmission}></GrocerySelection>
-            case 'Game Three':
-                return <TestGame onScoreSubmission={handleScoreSubmission} />
+                return <GrocerySelection onScoreSubmission={handleScoreSubmission} />
+            case "Bob Cleans":
+                return <BobCleans onScoreSubmission={handleScoreSubmission} />
             default:
                 return null
         }
-      }
+    }
 
-      return (
+    const containerStyle = {
+        position: "fixed",
+        top: `${position.top - 30}px`,
+        left: `${position.left + egg_dimension / 2 - 50}px`,
+        display: is_colliding ? 'flex' : 'none',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        textAlign: 'center',
+        backgroundImage: `url(${getBackgroundByGame(game)})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        padding: '10px',
+        borderRadius: '8px',
+        zIndex: 2
+    }
+
+    return (
         <>
-            <div style={{
-                position: "fixed",
-                top: `${position.top - 30}px`,
-                left: `${position.left + egg_dimension / 2 - 50}px`,
-                display: is_colliding ? 'flex' : 'none',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                textAlign: 'center', 
-                backgroundColor: 'yellow',
-                padding: '10px',
-                borderRadius: '8px',
-                zIndex: 2
-            }}>
+            <div style={containerStyle}>
                 <div style={{
-                    fontSize: '16px',
+                    fontSize: '20px',
                     fontWeight: 'bold',
                     color: '#333',
                     margin: '0px 10px',
                 }}>
                     {gameTitle}
                 </div>
-                <button 
+                <button
                     style={{
-                        backgroundColor: 'darkred',
+                        backgroundColor: 'blue',
                         border: 'none',
                         borderRadius: '8px',
                         padding: '8px 16px',
@@ -80,9 +101,9 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
                     Play
                 </button>
             </div>
-    
-            <img 
-                src={EggObject} 
+
+            <img
+                src={EggObject}
                 alt="Egg"
                 style={{
                     position: "fixed",
@@ -96,7 +117,7 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
                 }}
             />
 
-            <Modal 
+            <Modal
                 isOpen={isPopupOpen}
                 onRequestClose={handleClosePopup}
                 style={{
@@ -113,28 +134,27 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
                         width: '85vw',
                         height: '85vh',
                         backgroundColor: 'white',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        display: 'flex',
+                        flexDirection: 'column',
                     }
                 }}
             >
                 <div style={titleBarStyles}>
-                    <span style={{fontSize: '18px', fontWeight: 'bold'}}>{gameTitle}</span>
-                    <button 
-                        onClick={handleClosePopup} 
+                    <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{gameTitle}</span>
+                    <button
+                        onClick={handleClosePopup}
                         style={closeButtonTitleBarStyles}
                         onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
                         onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                     >❌</button>
                 </div>
-                <div style={{flex: 1, overflowY: 'auto'}}>
+                <div style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
                     {renderGame()}
                 </div>
             </Modal>
-
-
         </>
     )
-
 }
 
 const titleBarStyles = {
