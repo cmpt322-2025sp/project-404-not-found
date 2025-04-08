@@ -10,6 +10,7 @@ import groceryBackground from "../asset/images/grocerybg.jpg"
 import TestGame from "./games/TestGame"
 import GrocerySelection from "./games/GrocerySelection"
 import BobCleans from "./games/BobCleans"
+import DontDrownBob from "./games/DontDrownBob"
 
 const Egg = ({ position, is_colliding, game, onScore }) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false)
@@ -41,8 +42,8 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
 
     const renderGame = () => {
         switch (game) {
-            case 'Game One':
-                return <p>NO GAMES ATTACHED</p>
+            case 'Dont Drown Bob':
+                return <DontDrownBob onScoreSubmission={handleScoreSubmission} />
             case 'Grocery Store':
                 return <GrocerySelection onScoreSubmission={handleScoreSubmission} />
             case "Bob Cleans":

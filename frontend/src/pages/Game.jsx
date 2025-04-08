@@ -36,7 +36,7 @@ const Game = () => {
 
     // Score Data
     const [scores, setScores] = useState({
-        "Game One": 40,
+        "Dont Drown Bob": 0,
         "Grocery Store": 0,
         "Bob Cleans": 0
     })
@@ -128,8 +128,8 @@ const Game = () => {
     return (
         <Playground assignment={urlRefAssignmentName}>
             <Character position={character_position} movePlayer={movePlayer} ></Character>
-            {scores["Game One"] === 0 && (
-                <Egg position={object_1_position} is_colliding={is_colliding_1} game="Game One" onScore={handleScoreFromEgg} />
+            {scores["Dont Drown Bob"] === 0 && (
+                <Egg position={object_1_position} is_colliding={is_colliding_1} game="Dont Drown Bob" onScore={handleScoreFromEgg} />
             )}
             {scores["Grocery Store"] === 0 && (
                 <Egg position={object_2_position} is_colliding={is_colliding_2} game="Grocery Store" onScore={handleScoreFromEgg} />
