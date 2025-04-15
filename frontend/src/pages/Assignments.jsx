@@ -14,7 +14,6 @@ const Assignments = () => {
   const [rowsAreLoading, setRowsAreLoading] = useState(true)
   const [errors, setErrors] = useState({})
 
-  // Apply global reset for margin, padding, and box-sizing to fix the white border issue
   useEffect(() => {
     Object.assign(document.body.style, styles.globalReset);
     
@@ -85,10 +84,18 @@ const Assignments = () => {
                         <td style={styles.tableCell}>N/A</td>
                         <td style={styles.tableCell}>N/A</td>
                         <td style={styles.tableCell}>
-                          <button style={styles.actionButton} 
-                                onClick={() => {navigate(`/game?assignment=${assignment.name}&assignmentRef=${assignment._id}&classroom=${assignment.class_id}`)}} >
-                                  🚀 Start!
-                          </button>
+                          {new Date(assignment.due_date).setDate(new Date(assignment.due_date).getDate() + 1) < new Date() ? (
+                            <span style={{ color: 'gray', fontStyle: 'italic' }}>⏰ Past Due</span>
+                          ) : (
+                            <button
+                              style={styles.actionButton}
+                              onClick={() => {
+                                navigate(`/game?assignment=${assignment.name}&assignmentRef=${assignment._id}&classroom=${assignment.class_id}`);
+                              }}
+                            >
+                              🚀 Start!
+                            </button>
+                          )}
                         </td>
                     </tr>
 				))}
