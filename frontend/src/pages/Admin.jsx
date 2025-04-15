@@ -104,7 +104,7 @@ const Admin = () => {
                 </li>
                 <li>
                     <button
-                    onClick={() => navigate('/game')}
+                    onClick={() => navigate('/preview')}
                     style={{
                         padding: '6px 18px',
                         backgroundColor: '#0066dd',

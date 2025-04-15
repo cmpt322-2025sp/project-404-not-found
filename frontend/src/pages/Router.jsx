@@ -7,6 +7,7 @@ import Layout from "../components/Layout"
 import Page404 from "./Page404"
 
 import Game from "./Game"
+import Preview from "./Preview"
 import Assignments from "./Assignments"
 import Login from "./Login"
 import Admin from "./Admin"
@@ -25,6 +26,7 @@ const Router = () => {
                             </Route>
                             <Route element={<ProtectedAdminRoutes />}>
                                 <Route path="/admin/*" element={<Admin />} />
+                                <Route path="/preview" element={<Preview />} />
                             </Route>
                             <Route path="*" element={ <Page404/> }/>
                         </Route>

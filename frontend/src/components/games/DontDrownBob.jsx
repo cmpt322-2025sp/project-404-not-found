@@ -158,6 +158,25 @@ const DontDrownBob = ( {onScoreSubmission} ) => {
                 <div style={{ position: "absolute", top: "35%", left: "52%", transform: "translate(-50%, -50%)", backgroundColor: "rgba(0, 0, 0, 0.7)", padding: "20px", color: "white", fontSize: "30px" }}>
                     <h1>Victorious!</h1>
                     <p>Your score: {score}</p>
+                    <button
+                        style={{
+                            marginTop: "5%",
+                            padding: "4% 10%",
+                            cursor: "pointer",
+                            backgroundColor: "#4CAF50",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "12px",
+                            fontSize: "1rem",
+                            boxShadow: "0 3px 5px rgba(0,0,0,0.3)",
+                            transition: "transform 0.1s",
+                        }}
+                        onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
+                        onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
+                        onClick={submitScore}
+                        >
+                        Continue
+                    </button>
 
                 </div>
 
