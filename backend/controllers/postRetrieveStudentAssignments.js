@@ -1,4 +1,4 @@
-const { FindDocuments, FindDocument } = require("../core/DatabaseFunctions")
+const { FindDocuments, FindDocument, InsertDocument } = require("../core/DatabaseFunctions")
 
 const postRetrieveStudentAssignments = async (req, res) => {
     if(req.headers['sec-fetch-site'] === 'same-site'){
@@ -11,7 +11,21 @@ const postRetrieveStudentAssignments = async (req, res) => {
                     const assignments = await FindDocuments('assignments', { class_id: student.classroom_id, present_in_view: true }, {})
                     for (const assignment of assignments) {
                         const classroom_name = await FindDocument('classrooms', { _id: assignment.class_id }, {'name':1})
-                        const temp_data = {'_id':assignment._id, 'name':assignment.name, 'class_id':assignment.class_id, 'due_date':assignment.due_date, 'class_name': classroom_name.name}
+                        const assignment_progress = await FindDocument('completions', {assignment_id: assignment.id, user_id: req.body.student_id}, 'game_string eggs_collected')
+                        let game_string, eggs_collected
+                        if (assignment_progress) {
+                            game_string = assignment_progress.game_string
+                            eggs_collected = assignment_progress.eggs_collected
+                        } else {
+                            await InsertDocument('completions', {assignment_id: assignment.id, user_id: req.body.student_id})
+                            game_string = {
+                                "Dont Drown Bob": 0,
+                                "Grocery Store": 0,
+                                "Bob Cleans": 0
+                            }
+                            eggs_collected = 0
+                        }
+                        const temp_data = {'_id':assignment._id, 'name':assignment.name, 'class_id':assignment.class_id, 'due_date':assignment.due_date, 'class_name': classroom_name.name, 'game_string': game_string, 'eggs_collected': eggs_collected}
                         all_assignments.push(temp_data)
                     }
                     // all_assignments.push(...assignments)

@@ -185,6 +185,26 @@ const ExpressServicesProvider = ({ children }) =>{
         })
     }
 
+    const autoSaveProgress = (data) => {
+        return fetch(PROCESSURL + 'auto_save_progress', {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                csrf: data.csrf
+            },
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return {status: true}
+            }else{
+                return {status: false}
+            }
+        })
+    }
+
     return (
         <ExpressServicesContext.Provider value={{ 
             createClassroom, 
@@ -195,7 +215,8 @@ const ExpressServicesProvider = ({ children }) =>{
             addStudent,
             createAssignment,
             retrieveAssignments,
-            retrieveStudentAssignments
+            retrieveStudentAssignments,
+            autoSaveProgress
         }}>{children}</ExpressServicesContext.Provider>
     );
 

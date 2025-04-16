@@ -81,10 +81,10 @@ const Assignments = () => {
                         })}
                         </td>
                         <td style={styles.tableCell}>{assignment.class_name}</td>
-                        <td style={styles.tableCell}>N/A</td>
-                        <td style={styles.tableCell}>N/A</td>
+                        <td style={styles.tableCell}>{assignment.eggs_collected > 0 ? `${"🥚".repeat(assignment.eggs_collected)}` : 'N/A'}</td>
+                        <td style={styles.tableCell}>{Math.round(Object.values(assignment.game_string).reduce((sum, val) => sum + val, 0) / 3)}%</td>
                         <td style={styles.tableCell}>
-                          {new Date(assignment.due_date).setDate(new Date(assignment.due_date).getDate() + 1) < new Date() ? (
+                          {new Date(assignment.due_date).setDate(new Date(assignment.due_date).getDate()) < new Date() ? (
                             <span style={{ color: 'gray', fontStyle: 'italic' }}>⏰ Past Due</span>
                           ) : (
                             <button
@@ -93,7 +93,14 @@ const Assignments = () => {
                                 navigate(`/game?assignment=${assignment.name}&assignmentRef=${assignment._id}&classroom=${assignment.class_id}`);
                               }}
                             >
-                              🚀 Start!
+                             {
+                                assignment.eggs_collected === 3
+                                  ? '✅ Completed!'
+                                  : assignment.eggs_collected > 0
+                                    ? '🚀 Resume!'
+                                    : '🚀 Start!'
+                              }
+                              
                             </button>
                           )}
                         </td>
