@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 
 import toyBackground from "../asset/images/kidtoysbg.jpg"
 import groceryBackground from "../asset/images/grocerybg.jpg"
+import bobDrownBackground from "../asset/images/bobdrownbg.png"
 
 // Game components
 import TestGame from "./games/TestGame"
@@ -22,7 +23,7 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
             case "Bob Cleans":
                 return toyBackground
             default:
-                return toyBackground
+                return bobDrownBackground
         }
     }
 
@@ -65,6 +66,7 @@ const Egg = ({ position, is_colliding, game, onScore }) => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        backgroundColor: "#84e0d7",
         padding: '10px',
         borderRadius: '8px',
         zIndex: 2
