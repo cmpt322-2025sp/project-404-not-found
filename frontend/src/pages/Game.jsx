@@ -7,6 +7,7 @@ import Character from "../components/Character"
 import Egg from "../components/Egg"
 import ProgressBar from "../components/ProgressBar"
 import { character_speed, character_dimension, character_initial_position, island_positions } from "../Const"
+import { useExpressServices } from "../functions/ExpressServicesProvider"
 
 const Game = () => {
 
@@ -18,10 +19,33 @@ const Game = () => {
     const urlRefAssignmentId = queryParams.get('assignmentRef')
     const urlRefClassroomId = queryParams.get('classroom')
     const { userId } = useAuth()
+    const [loading, setLoading] = useState(true)
+
+    const expressServices = useExpressServices()
+    const [csrf, setCSRF] = useState('')
 
     if(!urlRefAssignmentName || !urlRefAssignmentId || !urlRefClassroomId){
         navigate('/assignments')
     }
+
+    useEffect(() => {
+        fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
+            .then((res) => res.json())
+            .then((response) => {
+                setCSRF(response.csrf);
+            })
+            .catch((err) => {
+                alert(err.error);
+            })
+    }, []);
+
+    const [scores, setScores] = useState({
+        "Dont Drown Bob": 0,
+        "Grocery Store": 0,
+        "Bob Cleans": 0
+    })
+
+    const [collectedEggs, setCollectedEggs] = useState(0)
 
     useEffect(() => {
         fetch(PROCESSURL + 'check_assignment_exists_for_student?user_id='+userId+'&'+queryParams, { method: 'GET', credentials: "include" })
@@ -29,22 +53,34 @@ const Game = () => {
             .then((assignment) => {
                 if(!assignment.exists){
                     navigate('/assignments')
+                }else{
+                    setScores(assignment.game_string)
+                    setCollectedEggs(assignment.eggs_collected)
+                    setLoading(false)
                 }
             })
 
     }, [navigate])
 
-    // Score Data
-    const [scores, setScores] = useState({
-        "Dont Drown Bob": 0,
-        "Grocery Store": 0,
-        "Bob Cleans": 0
-    })
     const handleScoreFromEgg = (game, score) => {
-        setScores((prevScores) => ({
-          ...prevScores,
-          [game]: score,
-        }))
+        if (score === 0){score = 1}
+
+        const updatedScores = {
+            ...scores,
+            [game]: score,
+        }
+        const updatedEggs = collectedEggs + 1
+    
+        setScores(updatedScores)
+        setCollectedEggs(updatedEggs)
+
+        expressServices.autoSaveProgress({ csrf: csrf, game_string: updatedScores, eggs_collected: updatedEggs, assignment_id: urlRefAssignmentId, user_id: userId })
+            .then((result) => {
+                console.log(result)
+            })
+            .catch((error) => {
+                alert("Failed to save progress! Please refresh the page.")
+            })
     }
 
 
@@ -125,7 +161,9 @@ const Game = () => {
         })
     }
 
-    return (
+    return loading ? (
+        <h2>loading...</h2>
+    ) : (
         <Playground assignment={urlRefAssignmentName}>
             <Character position={character_position} movePlayer={movePlayer} ></Character>
             {scores["Dont Drown Bob"] === 0 && (
@@ -137,7 +175,7 @@ const Game = () => {
             {scores["Bob Cleans"] === 0 && (
                 <Egg position={object_3_position} is_colliding={is_colliding_3} game="Bob Cleans" onScore={handleScoreFromEgg} />
             )}
-            <ProgressBar scores={scores}></ProgressBar>
+            <ProgressBar scores={scores} eggs_collected={collectedEggs}></ProgressBar>
         </Playground>
     );
 }

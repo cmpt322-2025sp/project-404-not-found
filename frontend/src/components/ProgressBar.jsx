@@ -1,10 +1,8 @@
 import React from "react"
 import Logout from "./Logout"
 
-const ProgressBar = ({ scores }) => {
-    const totalGames = Object.keys(scores).length
-    const eggsCollected = Object.values(scores).filter(score => score > 0).length
-    const eggsRemaining = totalGames - eggsCollected
+const ProgressBar = ({ scores, eggs_collected }) => {
+    const eggsRemaining = 3 - eggs_collected
 
     return (
         <div style={containerStyle}>
