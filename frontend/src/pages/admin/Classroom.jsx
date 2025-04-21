@@ -151,7 +151,7 @@ const Classroom = () => {
                 <button onClick={() => setShowFileUploadPopUp(true)} style={buttonStyle}>
                     Upload CSV
                 </button>
-                <button onClick={() => setShowAddStudentPopUp(true)} style={buttonStyle}>
+                <button onClick={() => setShowAddStudentPopUp(true)} style={{...buttonStyle, marginLeft: '10px'}}>
                     Add Student
                 </button>
             </div>
@@ -201,7 +201,7 @@ const Classroom = () => {
                                 <button
                                     type="button"
                                     onClick={() => {setShowFileUploadPopUp(false); setCsvData([]); setErrors({ processing: false, success: false })}}
-                                    style={buttonStyle}
+                                    style={{...buttonStyle, backgroundColor:'#dd0000', marginLeft: '5px'}}
                                 >
                                     Cancel
                                 </button>
@@ -302,7 +302,7 @@ const Classroom = () => {
                                         setFormData({}); 
                                         setErrors({ processing: false, success: false });
                                     }}
-                                    style={{...buttonStyle, backgroundColor:'#dd0000'}}
+                                    style={{...buttonStyle, backgroundColor:'#dd0000', marginLeft: '5px'}}
                                 >
                                     Cancel
                                 </button>
@@ -317,25 +317,23 @@ const Classroom = () => {
                 <p>Loading...</p>
             ) : (
 
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <table style={tableStyle}>
                     <thead>
-                        <tr style={{ backgroundColor: '#f4f4f4', textAlign: 'left' }}>
-                            <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>First Name</th>
-                            <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Last Name</th>
-                            <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Student ID</th>
-                            <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Email</th>
-                            <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Last Login</th>
-                            <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Actions</th>
+                        <tr>
+                            <th style={thStyle}>Student Name</th>
+                            <th style={thStyle}>Student ID</th>
+                            <th style={thStyle}>Email</th>
+                            <th style={thStyle}>Last Login</th>
+                            <th style={thStyle}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {students.map((student, index) => (
-                            <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                                <td style={{ padding: '10px' }}>{student.first_name}</td>
-                                <td style={{ padding: '10px' }}>{student.last_name}</td>
-                                <td style={{ padding: '10px' }}>{student.student_id}</td>
-                                <td style={{ padding: '10px' }}>{student.email}</td>
-                                <td style={{ padding: '10px' }}>
+                            <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9f9f9' }}>
+                                <td style={tdStyle}>{student.first_name} {student.last_name}</td>
+                                <td style={tdStyle}>{student.student_id}</td>
+                                <td style={tdStyle}>{student.email}</td>
+                                <td style={tdStyle}>
                                     {new Date(student.last_login).toLocaleString('en-US', {
                                         weekday: 'long',
                                         year: 'numeric',
@@ -345,9 +343,10 @@ const Classroom = () => {
                                         minute: '2-digit',
                                         second: '2-digit',
                                         hour12: true,
+                                        timeZone: 'UTC',
                                     })}
                                 </td>
-                                <td style={{ padding: '10px' }}></td>
+                                <td style={tdStyle}></td>
                             </tr>
                         ))}
                     </tbody>
@@ -383,15 +382,16 @@ const popupContentStyles = {
 }
 
 const buttonStyle = {
-    padding: '5px 15px',
-    margin: '5px',
+    padding: '8px 16px',
     border: 'none',
-    borderRadius: '4px',
+    borderRadius: '6px',
     backgroundColor: '#0066dd',
     color: '#fff',
     fontSize: '14px',
+    fontWeight: '500',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
+    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
 }
 
 const inputStyle = {
@@ -407,6 +407,33 @@ const labelStyle = {
     fontWeight: '600',
     color: '#333',
     marginRight: '10px',
+}
+
+const tableStyle = {
+    width: '100%',
+    borderCollapse: 'separate',
+    borderSpacing: 0,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    marginTop: '15px',
+}
+
+const thStyle = {
+    textAlign: 'left',
+    padding: '14px 20px',
+    backgroundColor: '#f0f2f5',
+    fontWeight: '600',
+    fontSize: '15px',
+    color: '#333',
+    borderBottom: '1px solid #ddd',
+}
+
+const tdStyle = {
+    padding: '14px 20px',
+    fontSize: '14px',
+    color: '#555',
+    borderBottom: '1px solid #eee',
 }
 
 export default Classroom

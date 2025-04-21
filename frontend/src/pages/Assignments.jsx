@@ -13,6 +13,7 @@ const Assignments = () => {
   const [assignments, setAssignments] = useState([])
   const [rowsAreLoading, setRowsAreLoading] = useState(true)
   const [errors, setErrors] = useState({})
+  const auth = useAuth()
 
   useEffect(() => {
     Object.assign(document.body.style, styles.globalReset);
@@ -43,6 +44,9 @@ const Assignments = () => {
         <h2 style={styles.header}>📚 My Assignments 🎮</h2>
 
         <p style={styles.welcomeText}>Hi there, {userFirstName}! 👋</p>
+        <div style={styles.logoutContainer}>
+          <button onClick={(e) => { e.preventDefault(); auth.logout() }} style={styles.logoutButton}>🚪 Logout</button>
+        </div>
 
 		{errors.server_1 && (
 			<p style={{ color: 'red', fontSize: '14px', marginBottom: '15px' }}>
@@ -78,13 +82,14 @@ const Assignments = () => {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
+                            timeZone: 'UTC',
                         })}
                         </td>
                         <td style={styles.tableCell}>{assignment.class_name}</td>
                         <td style={styles.tableCell}>{assignment.eggs_collected > 0 ? `${"🥚".repeat(assignment.eggs_collected)}` : 'N/A'}</td>
                         <td style={styles.tableCell}>{Math.round(Object.values(assignment.game_string).reduce((sum, val) => sum + val, 0) / 3)}%</td>
                         <td style={styles.tableCell}>
-                          {new Date(assignment.due_date).setDate(new Date(assignment.due_date).getDate()) < new Date() ? (
+                          {new Date(assignment.due_date).toISOString().split('T')[0] < new Date().toISOString().split('T')[0] ? (
                             <span style={{ color: 'gray', fontStyle: 'italic' }}>⏰ Past Due</span>
                           ) : (
                             <button
@@ -215,6 +220,23 @@ const styles = {
     fontSize: '1.3em',
     color: '#fff',
     fontWeight: 'bold',
+  },
+  logoutContainer: {
+    position: 'absolute',
+    top: '20px',
+    right: '30px',
+  },
+  
+  logoutButton: {
+    backgroundColor: '#ffffff',
+    color: '#ff4d4d',
+    border: '2px solid #ff4d4d',
+    padding: '10px 20px',
+    fontSize: '1em',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'all 0.3s ease',
   },
 };
 

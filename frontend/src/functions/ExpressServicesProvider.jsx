@@ -205,6 +205,46 @@ const ExpressServicesProvider = ({ children }) =>{
         })
     }
 
+    const retrieveAssignmentCompletions = (data) => {
+        return fetch(PROCESSURL + 'retrieve_completions_for_assignment', {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                csrf: data.csrf
+            },
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return {completions: response.completions, assignment_info: response.assignment_info}
+            }else{
+                return JSON.stringify(response)
+            }
+        })
+    }
+
+    const changeAssignmentDueDate = (data) => {
+        return fetch(PROCESSURL + 'change_due_date', {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                csrf: data.csrf
+            },
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return {status: true}
+            }else{
+                return JSON.stringify(response)
+            }
+        })
+    }
+
     return (
         <ExpressServicesContext.Provider value={{ 
             createClassroom, 
@@ -216,7 +256,9 @@ const ExpressServicesProvider = ({ children }) =>{
             createAssignment,
             retrieveAssignments,
             retrieveStudentAssignments,
-            autoSaveProgress
+            autoSaveProgress,
+            retrieveAssignmentCompletions,
+            changeAssignmentDueDate
         }}>{children}</ExpressServicesContext.Provider>
     );
 

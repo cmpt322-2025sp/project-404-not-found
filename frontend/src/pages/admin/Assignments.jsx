@@ -72,19 +72,21 @@ const Assignments = () => {
 
     return (
         <div>
-            <h2>All Assignments</h2>
+            <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#222', marginBottom: '20px' }}>
+                📚 All Assignments
+            </h2>
 
-            <button style={buttonStyle} onClick={() => setShowPopup(true)}>Create New Assignment</button>
-            <br/>
-            <br/>
+            <button style={buttonStyle} onClick={() => setShowPopup(true)}>
+                ➕ Create New Assignment
+            </button>
 
             {showPopup && (
                 <div style={popupStyles}>
                     <div style={popupContentStyles}>
-                        <h3>Create Assignment</h3>
+                        <h3 style={{ marginBottom: '10px' }}>Create Assignment</h3>
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                                <label htmlFor="assignmentName" style={{ ...labelStyle, width: '150px' }}>
+                                <label htmlFor="assignmentName" style={{ fontSize: '14px', color: '#333', marginBottom: '5px' }}>
                                     Assignment Name
                                 </label>
                                 <input
@@ -95,12 +97,18 @@ const Assignments = () => {
                                     value={formData.assignmentName || ""}
                                     onChange={handleChange}
                                     placeholder="Assignment Name"
-                                    style={inputStyle}
+                                    style={{
+                                        padding: '10px',
+                                        border: '1px solid #ccc',
+                                        borderRadius: '6px',
+                                        fontSize: '15px',
+                                        marginBottom: '10px',
+                                    }}
                                 />
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                                <label htmlFor="assignmentDue" style={{ ...labelStyle, width: '150px' }}>
+                                <label htmlFor="assignmentDue" style={{ fontSize: '14px', color: '#333', marginBottom: '5px' }}>
                                     Assignment Due On
                                 </label>
                                 <input
@@ -111,12 +119,18 @@ const Assignments = () => {
                                     value={formData.assignmentDue || ""}
                                     onChange={handleChange}
                                     placeholder="Due Date"
-                                    style={inputStyle}
+                                    style={{
+                                        padding: '10px',
+                                        border: '1px solid #ccc',
+                                        borderRadius: '6px',
+                                        fontSize: '15px',
+                                        marginBottom: '10px',
+                                    }}
                                 />
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                                <label htmlFor="assignmentClass" style={{ ...labelStyle, width: '150px' }}>
+                                <label htmlFor="assignmentClass" style={{ fontSize: '14px', color: '#333', marginBottom: '5px' }}>
                                     Class
                                 </label>
                                 <select
@@ -125,7 +139,13 @@ const Assignments = () => {
                                     required
                                     value={formData.assignmentClass || ""}
                                     onChange={handleChange}
-                                    style={inputStyle}
+                                    style={{
+                                        padding: '10px',
+                                        border: '1px solid #ccc',
+                                        borderRadius: '6px',
+                                        fontSize: '15px',
+                                        marginBottom: '10px',
+                                    }}
                                 >
                                     <option value="" disabled>Select a Class</option>
                                     {classrooms.map((classroom, index) => (
@@ -134,29 +154,15 @@ const Assignments = () => {
                                 </select>
                             </div>
 
-                            {errors.server_1 && (
-                                <p style={{ color: 'red', fontSize: '14px', marginBottom: '15px' }}>
-                                    {errors.server_1}
-                                </p>
-                            )}
+                            {errors.server_1 && <p style={{ color: 'red' }}>{errors.server_1}</p>}
+                            {errors.processing && <p style={{ color: 'orange' }}>{errors.processing}</p>}
+                            {errors.success && <p style={{ color: 'green' }}>{errors.success}</p>}
 
-                            {errors.processing && (
-                                <p style={{ color: 'yellow', fontSize: '14px', marginBottom: '15px' }}>
-                                    {errors.processing}
-                                </p>
-                            )}
-
-                            {errors.success && (
-                                <p style={{ color: 'green', fontSize: '14px', marginBottom: '15px' }}>
-                                    {errors.success}
-                                </p>
-                            )}
-
-                            <div>
+                            <div style={{ marginTop: '10px' }}>
                                 <input
                                     type="submit"
                                     value="Create Assignment"
-                                    style={buttonStyle}
+                                    style={{ ...buttonStyle, marginRight: '10px' }}
                                 />
                                 <button
                                     type="button"
@@ -175,35 +181,36 @@ const Assignments = () => {
                 <p>Loading...</p>
             ) : (
 
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table style={tableStyle}>
                 <thead>
                     <tr style={{ backgroundColor: '#f4f4f4', textAlign: 'left' }}>
-                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Assignment Name</th>
-                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Assigned Class</th>
-                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Due Date</th>
-                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Actions</th>
+                        <th style={thStyle}>Assignment Name</th>
+                        <th style={thStyle}>Assigned Class</th>
+                        <th style={thStyle}>Due Date</th>
+                        <th style={thStyle}>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                 {assignments.map((assignment, index) => (
-                    <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                        <td style={{ padding: '10px' }}>{assignment.name}</td>
-                        <td style={{ padding: '10px' }}>
+                    <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9f9f9' }}>
+                        <td style={tdStyle}>{assignment.name}</td>
+                        <td style={tdStyle}>
                         <button style={buttonStyle} 
                             onClick={() => {navigate(`/admin/classroom?classroomName=${classrooms.find((classroom) => classroom._id === assignment.class_id).name}&classroom=${assignment.class_id}`)}}>{classrooms.find((classroom) => classroom._id === assignment.class_id).name}</button>
                         </td>
-                        <td style={{ padding: '10px' }}>
+                        <td style={tdStyle}>
                         {new Date(assignment.due_date).toLocaleString('en-US', {
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
+                            timeZone: 'UTC',
                         })}
                         </td>
-                        <td>
-                            <button style={buttonStyle} 
-                            onClick={() => {navigate(`/admin/assignment?assignmentName=${assignment.name}&assignment=${assignment._id}`)}} >Access Assignment</button>
-                            <button style={{...buttonStyle, backgroundColor:'#dd0000'}} onClick={() => {}}>Delete</button>
+                        <td style={tdStyle}>
+                            <button style={{ ...buttonStyle, marginRight: '10px' }} 
+                            onClick={() => {navigate(`/admin/assignment?assignmentName=${assignment.name}&assignment=${assignment._id}`)}} >View Assignment</button>
+                            <button style={{...buttonStyle, backgroundColor:'#dd0000'}} onClick={() => {}}>Delete Assignment</button>
                         </td>
                     </tr>
                     ))}
@@ -230,45 +237,59 @@ const popupStyles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 1000,
 }
 
 const popupContentStyles = {
-    backgroundColor: 'white',
-    padding: '20px',
-    borderRadius: '5px',
-    width: '300px',
-    textAlign: 'center',
+    backgroundColor: '#fff',
+    padding: '25px',
+    borderRadius: '10px',
+    width: '340px',
+    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+    textAlign: 'left',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'stretch',
     gap: '10px',
 }
 
+const tableStyle = {
+    width: '100%',
+    borderCollapse: 'separate',
+    borderSpacing: 0,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    marginTop: '15px',
+}
+
+const thStyle = {
+    textAlign: 'left',
+    padding: '14px 20px',
+    backgroundColor: '#f0f2f5',
+    fontWeight: '600',
+    fontSize: '15px',
+    color: '#333',
+    borderBottom: '1px solid #ddd',
+}
+
+const tdStyle = {
+    padding: '14px 20px',
+    fontSize: '14px',
+    color: '#555',
+    borderBottom: '1px solid #eee',
+}
+
 const buttonStyle = {
-    padding: '5px 15px',
-    margin: '5px',
+    padding: '8px 16px',
     border: 'none',
-    borderRadius: '4px',
+    borderRadius: '6px',
     backgroundColor: '#0066dd',
     color: '#fff',
     fontSize: '14px',
+    fontWeight: '500',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
-}
-
-const inputStyle = {
-    padding: '10px',
-    fontSize: '16px',
-    borderRadius: '5px',
-    border: '1px solid #ccc',
-    boxSizing: 'border-box',
-}
-
-const labelStyle = {
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#333',
-    marginRight: '10px',
+    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
 }
 
 export default Assignments

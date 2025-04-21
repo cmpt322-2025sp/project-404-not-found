@@ -18,5 +18,7 @@ router.get('/check_assignment_exists',controller.getAssignment)
 router.post('/retrieve_student_assignments',controller.postRetrieveStudentAssignments)
 router.get('/check_assignment_exists_for_student',controller.getAssignmentExists)
 router.post('/auto_save_progress',controller.postAutoSaveProgress)
+router.post('/retrieve_completions_for_assignment',controller.postRetrieveCompletionsForAssignment)
+router.post('/change_due_date',controller.postChangeAssignmentDue)
 
 module.exports = router;
