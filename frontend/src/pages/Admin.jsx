@@ -6,7 +6,6 @@ import Classrooms from "./admin/Classrooms"
 import Classroom from "./admin/Classroom"
 import Assignments from "./admin/Assignments"
 import Assignment from "./admin/Assignment"
-import Games from "./admin/Games"
 
 const Admin = () => {
     const navigate = useNavigate()
@@ -63,27 +62,6 @@ const Admin = () => {
                     Assignments
                     </Link>
                 </li>
-                <li style={{ marginRight: '15px' }}>
-                    <Link
-                    to="/admin/games"
-                    onClick={() => setActiveTab('/admin/games')}
-                    style={{
-                        display: 'block',
-                        textDecoration: 'none',
-                        color: activeTab === '/admin/games' ? 'white' : 'black',
-                        backgroundColor: activeTab === '/admin/games' ? '#0066dd' : '#f1f1f1',
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        padding: '8px 14px',
-                        borderRadius: '6px',
-                        width: '130px',
-                        textAlign: 'center',
-                        transition: 'all 0.3s ease',
-                    }}
-                    >
-                    Games
-                    </Link>
-                </li>
                 <li style={{ marginLeft: 'auto', marginRight: '10px' }}>
                     <button
                     onClick={(e) => { e.preventDefault(); auth.logout(); }}
@@ -129,7 +107,6 @@ const Admin = () => {
                 <Route path="classroom/*" element={<Classroom />} />
                 <Route path="assignments" element={<Assignments />} />
                 <Route path="assignment/*" element={<Assignment />} />
-                <Route path="games" element={<Games />} />
                 </Routes>
             </div>
             </div>

@@ -36,9 +36,9 @@ const UpdateDocument = async (collection, condition = {}, data = {}) => {
     }
 }
 
-const FindDocuments = (collection, condition = {}, projection = 'id') => {
+const FindDocuments = (collection, condition = {}, projection = 'id', sort = {}) => {
     const Model = require('../models/'+collection);
-    const Document = Model.find(condition, projection).exec();
+    const Document = Model.find(condition, projection).sort(sort).exec();
     return Document;
 }
 
