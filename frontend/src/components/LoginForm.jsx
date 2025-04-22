@@ -125,6 +125,7 @@ const LoginForm = () => {
                             margin: 'auto'
                         }}
                         placeholder="📧 Your Email"
+                        autoFocus="autofocus"
                     />
                 </div>
 

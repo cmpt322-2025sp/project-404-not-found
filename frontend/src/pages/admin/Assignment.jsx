@@ -65,7 +65,7 @@ const Assignment = () => {
                 if (result.error) {
                     setErrors({ server_1: result.error })
                 } else {
-                    setRowsAreLoading(true)
+                    // setRowsAreLoading(true)
                     fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
                         .then((res) => res.json())
                         .then((response) => {
@@ -77,7 +77,7 @@ const Assignment = () => {
                         .then((completionData) => {
                             setCompletions(completionData.completions)
                             setInfo(completionData.assignment_info)
-                            setRowsAreLoading(false)
+                            // setRowsAreLoading(false)
                         })
                         .catch((err) => {
                             alert(err.error)
@@ -92,7 +92,7 @@ const Assignment = () => {
     return (
         <div>
             <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#222', marginBottom: '20px' }}>
-                📚 Assignments / {assignmentName}
+                📄 Assignments / {assignmentName}
             </h2>
 
             <div style={assignmentInfoBox}>
@@ -102,7 +102,7 @@ const Assignment = () => {
                 ) : (
                     <>
                     <p><strong>Assignment Name:</strong> {info.name}</p>
-                    <p><strong>Class:</strong> {info.class}</p>
+                    <p><strong>Class:</strong> {info.class} <button style={{...buttonStyle, backgroundColor:'#0066dd'}} onClick={() => {navigate(`/admin/classroom?classroomName=${encodeURIComponent(info.class)}&classroom=${info.class_id}`)}}>👁️</button></p>
                     <p><strong>Created On:</strong> {new Date(info.created_on).toLocaleDateString('en-US', {
                         weekday: 'long',
                         year: 'numeric',
@@ -116,7 +116,7 @@ const Assignment = () => {
                         month: 'long',
                         day: 'numeric',
                         timeZone: 'UTC',
-                    })} <button style={{...buttonStyle, backgroundColor:'gray'}} onClick={() => {setShowDueChangePopup(true)}}>✏️📆</button> </p>
+                    })} <button style={{...buttonStyle, backgroundColor:'gray'}} onClick={() => {setShowDueChangePopup(true)}}>✏️</button> </p>
                     </>
                 )}
             </div>
@@ -200,10 +200,6 @@ const Assignment = () => {
                                         year: 'numeric',
                                         month: 'long',
                                         day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        second: '2-digit',
-                                        hour12: true,
                                         timeZone: 'UTC',
                                     })}
                                 </td>

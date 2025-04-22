@@ -70,10 +70,37 @@ const Assignments = () => {
             })
     }
 
+    const deleteAssignment = (assignmentId) => {
+        setFormData({})
+        formData['csrf'] = csrf
+        formData['assignmentId']= assignmentId
+        expressServices.deleteAssignment(formData)
+            .then((result) => {
+                if (result === true) {
+                    fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
+                        .then((res) => res.json())
+                        .then((response) => {
+                            setCSRF(response.csrf)
+                            return expressServices.retrieveAssignments({ csrf: response.csrf })
+                        })
+                        .then((assignmentsData) => {
+                            setAssignments(assignmentsData)
+                            setFormData({})
+                            alert("Assignment Deleted")
+                        })
+                        .catch((err) => {
+                            alert("Failed to fetch assignments after deletion.");
+                        })
+                } else {
+                    alert('Failed to delete.')
+                }
+            })
+    }
+
     return (
         <div>
             <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#222', marginBottom: '20px' }}>
-                📚 All Assignments
+                📁 All Assignments
             </h2>
 
             <button style={buttonStyle} onClick={() => setShowPopup(true)}>
@@ -103,6 +130,7 @@ const Assignments = () => {
                                         borderRadius: '6px',
                                         fontSize: '15px',
                                         marginBottom: '10px',
+                                        marginLeft: '10px'
                                     }}
                                 />
                             </div>
@@ -125,6 +153,7 @@ const Assignments = () => {
                                         borderRadius: '6px',
                                         fontSize: '15px',
                                         marginBottom: '10px',
+                                        marginLeft: '10px'
                                     }}
                                 />
                             </div>
@@ -145,6 +174,7 @@ const Assignments = () => {
                                         borderRadius: '6px',
                                         fontSize: '15px',
                                         marginBottom: '10px',
+                                        marginLeft: '10px'
                                     }}
                                 >
                                     <option value="" disabled>Select a Class</option>
@@ -210,7 +240,15 @@ const Assignments = () => {
                         <td style={tdStyle}>
                             <button style={{ ...buttonStyle, marginRight: '10px' }} 
                             onClick={() => {navigate(`/admin/assignment?assignmentName=${assignment.name}&assignment=${assignment._id}`)}} >View Assignment</button>
-                            <button style={{...buttonStyle, backgroundColor:'#dd0000'}} onClick={() => {}}>Delete Assignment</button>
+                            <button style={{...buttonStyle, backgroundColor:'#dd0000'}} 
+                                onClick={() => {
+                                    const confirmation = prompt("This will delete this assignment and erase assignment progress for all students. This action is irreversible! \n\nType CONFIRM to confirm the action.");
+                                    if (confirmation === "CONFIRM"){
+                                        deleteAssignment(assignment._id)
+                                    }
+                                }}>
+                                Delete Assignment
+                            </button>
                         </td>
                     </tr>
                     ))}

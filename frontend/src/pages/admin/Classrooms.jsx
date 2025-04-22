@@ -177,7 +177,7 @@ const Classrooms = () => {
                                         style={{ ...buttonStyle, marginRight: '10px' }}
                                         onClick={() => navigate(`classroom?classroomName=${classroom.name}&classroom=${classroom._id}`)}
                                     >
-                                        View Classroom
+                                        👁️ View
                                     </button>
                                     {classroom.students_count === 0 && (
                                         <button

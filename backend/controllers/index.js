@@ -18,5 +18,7 @@ module.exports = {
     postAutoSaveProgress: require('./postAutoSaveProgress'),
     postRetrieveCompletionsForAssignment: require('./postRetrieveCompletionsForAssignment'),
     postChangeAssignmentDue: require('./postChangeAssignmentDue'),
+    postDeleteAssignment: require('./postDeleteAssignment'),
+    postChangeClassroomName: require('./postChangeClassroomName'),
 
 }
