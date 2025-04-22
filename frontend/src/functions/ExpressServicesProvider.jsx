@@ -98,7 +98,7 @@ const ExpressServicesProvider = ({ children }) =>{
         .then((res) => res.json())
         .then((response) => {
             if(response.status === true){
-                return response.students
+                return {students: response.students, classroom: response.classroom}
             }else{
                 return JSON.stringify(response)
             }
@@ -245,6 +245,46 @@ const ExpressServicesProvider = ({ children }) =>{
         })
     }
 
+    const deleteAssignment = (data) => {
+        return fetch(PROCESSURL + 'delete_assignment', {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                csrf: data.csrf
+            },
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return true
+            }else{
+                return false
+            }
+        })
+    }
+
+    const changeClassroomName = (data) => {
+        return fetch(PROCESSURL + 'change_classroom_name', { 
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                csrf: data.csrf
+            },
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return true
+            }else{
+                return JSON.stringify(response)
+            }
+        })
+    }
+
     return (
         <ExpressServicesContext.Provider value={{ 
             createClassroom, 
@@ -258,7 +298,9 @@ const ExpressServicesProvider = ({ children }) =>{
             retrieveStudentAssignments,
             autoSaveProgress,
             retrieveAssignmentCompletions,
-            changeAssignmentDueDate
+            changeAssignmentDueDate,
+            deleteAssignment,
+            changeClassroomName
         }}>{children}</ExpressServicesContext.Provider>
     );
 

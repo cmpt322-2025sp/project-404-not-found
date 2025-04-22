@@ -13,6 +13,7 @@ const postRetrieveCompletionsForAssignment = async (req, res) => {
                     name: this_assignment.name,
                     due_date: this_assignment.due_date,
                     class: this_class.name,
+                    class_id: this_class._id,
                     created_on: this_assignment.createdAt
                 }
 

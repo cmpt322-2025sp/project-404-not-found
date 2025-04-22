@@ -21,7 +21,9 @@ const Classroom = () => {
     const [errors, setErrors] = useState({ processing: false, success: false })
     const [students, setStudents] = useState([])
     const [rowsAreLoading, setRowsAreLoading] = useState(true)
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState({})
+    const [classroomInfo, setClassroomInfo] = useState({})
+    const [showNameChangePopup, setShowNameChangePopup] = useState(false)
 
     useEffect(() => {
         fetch(PROCESSURL + 'check_classroom_exists?'+queryParams, { method: 'GET', credentials: "include" })
@@ -42,7 +44,8 @@ const Classroom = () => {
                 return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
             })
             .then((studentsData) => {
-                setStudents(studentsData)
+                setStudents(studentsData.students)
+                setClassroomInfo(studentsData.classroom)
                 setRowsAreLoading(false)
             })
             .catch((err) => {
@@ -89,7 +92,8 @@ const Classroom = () => {
                                 return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
                             })
                             .then((studentsData) => {
-                                setStudents(studentsData)
+                                setStudents(studentsData.students)
+                                setClassroomInfo(studentsData.classroom)
                                 setCsvData([])
                                 setErrors({ success: "Student Accounts Created" })
                             })
@@ -128,7 +132,8 @@ const Classroom = () => {
                         return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
                     })
                     .then((studentsData) => {
-                        setStudents(studentsData)
+                        setStudents(studentsData.students)
+                        setClassroomInfo(studentsData.classroom)
                         setFormData({})
                         setErrors({ success: "Student Account Created" })
                     })
@@ -143,18 +148,124 @@ const Classroom = () => {
         })
     }
 
+    const handleNameChangeSubmit = (event) => {
+        setErrors({ processing: "Please Wait..." })
+        event.preventDefault();
+        formData['csrf'] = csrf;
+        formData['classroomId'] = classroomId;
+        expressServices.changeClassroomName(formData)
+        .then((result) => {
+            if (JSON.parse(result).status === false) {
+                setErrors({ server_1: JSON.parse(result).error })
+            } else {
+                // setRowsAreLoading(true)
+                fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
+                    .then((res) => res.json())
+                    .then((response) => {
+                        setCSRF(response.csrf)
+                        return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
+                    })
+                    .then((studentsData) => {
+                        setStudents(studentsData.students)
+                        setClassroomInfo(studentsData.classroom)
+                        setFormData({})
+                        setErrors({ success: "Classroom Name Updated" })
+                        navigate(`/admin/classroom?classroomName=${encodeURIComponent(formData['newClassroomName'])}&classroom=${classroomId}`)
+                        // setRowsAreLoading(false)
+                    })
+                    .catch((err) => {
+                        alert("Failed to fetch students after classroom update.");
+                    })
+            }
+        })
+        .catch((error) => {
+            setErrors({ server_1: "An error occurred, please try again." })
+            setLoading(false)
+        })
+    }
+
+    const handleChangeNameChange = (event) => {
+        setFormData({})
+        const name = event.target.name;
+        const value = event.target.value;
+        setFormData(values => ({...values, [name]: value}))
+    }
+
     return (
         <div>
-            <h2>Classrooms / {classroomName}</h2>
+            <h2>👩‍🏫 Classrooms / {classroomName}</h2>
 
             <div style={{marginBottom: '10px'}}>
                 <button onClick={() => setShowFileUploadPopUp(true)} style={buttonStyle}>
-                    Upload CSV
+                    📄 Upload CSV
                 </button>
                 <button onClick={() => setShowAddStudentPopUp(true)} style={{...buttonStyle, marginLeft: '10px'}}>
-                    Add Student
+                    🧑‍🎓 Add Student
                 </button>
             </div>
+
+            <div style={classroomInfoBox}>
+                <h3 style={infoHeadingStyle}>📌 Classroom Info</h3>
+                {rowsAreLoading ? (
+                    <p>Loading...</p>
+                ) : (
+                    <>
+                    <p><strong>Classroom Name:</strong> {classroomInfo.name} <button style={{...buttonStyle, backgroundColor:'gray', marginLeft: '0.3%'}} onClick={() => setShowNameChangePopup(true)}>✏️</button> </p>
+                    <p><strong>Number of Students:</strong> {classroomInfo.students_count}</p>
+                    </>
+                )}
+            </div>
+
+            {showNameChangePopup && (
+                 <div style={popupStyles}>
+                    <div style={popupContentStyles}>
+                        <h3 style={{ marginBottom: '10px' }}>Change Classroom Name</h3>
+                        <form onSubmit={handleNameChangeSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                                <label htmlFor="newClassroomName" style={{ fontSize: '14px', color: '#333', marginBottom: '5px' }}>
+                                    Classroom Name
+                                </label>
+                                <input
+                                    type="text"
+                                    name="newClassroomName"
+                                    id="newClassroomName"
+                                    required
+                                    value={formData.newClassroomName || ""}
+                                    onChange={handleChangeNameChange}
+                                    placeholder="Classroom Name"
+                                    style={{
+                                        padding: '10px',
+                                        border: '1px solid #ccc',
+                                        borderRadius: '6px',
+                                        fontSize: '15px',
+                                        marginBottom: '10px',
+                                        marginLeft: '10px'
+                                    }}
+                                />
+                            </div>
+
+                            {errors.server_1 && <p style={{ color: 'red' }}>{errors.server_1}</p>}
+                            {errors.processing && <p style={{ color: 'orange' }}>{errors.processing}</p>}
+                            {errors.success && <p style={{ color: 'green' }}>{errors.success}</p>}
+
+                            <div style={{ marginTop: '10px' }}>
+                                <input
+                                    type="submit"
+                                    value="Change Classroom Name"
+                                    style={{ ...buttonStyle, marginRight: '10px' }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowNameChangePopup(false); setErrors({ processing: false, success: false }); setFormData({}) }}
+                                    style={{...buttonStyle, backgroundColor:'#dd0000'}}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {showFileUploadPopUp && (
                 <div style={popupStyles}>
@@ -339,10 +450,6 @@ const Classroom = () => {
                                         year: 'numeric',
                                         month: 'long',
                                         day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        second: '2-digit',
-                                        hour12: true,
                                         timeZone: 'UTC',
                                     })}
                                 </td>
@@ -434,6 +541,25 @@ const tdStyle = {
     fontSize: '14px',
     color: '#555',
     borderBottom: '1px solid #eee',
+}
+
+const classroomInfoBox = {
+    backgroundColor: '#fffbe6',
+    border: '1px solid #ffe58f',
+    padding: '16px 20px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+    fontSize: '15px',
+    color: '#333',
+}
+
+const infoHeadingStyle = {
+    marginTop: 0,
+    marginBottom: '10px',
+    fontSize: '16px',
+    fontWeight: '600',
+    color: '#d48806',
 }
 
 export default Classroom
