@@ -34,17 +34,17 @@ const DontDrownBob = ({ onScoreSubmission }) => {
         Math.floor(Math.random() * 11),
         Math.floor(Math.random() * 11),
         Math.floor(Math.random() * 11),
-    ]);
-    const [originalYs] = useState([
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-    ]);
+    ] );
+    const [originalYs] = useState( [
+        Math.floor(Math.random() * originalXs[0]),
+        Math.floor(Math.random() * originalXs[1]),
+        Math.floor(Math.random() * originalXs[2]),
+        Math.floor(Math.random() * originalXs[3]),
+        Math.floor(Math.random() * originalXs[4]),
+        Math.floor(Math.random() * originalXs[5]),
+        Math.floor(Math.random() * originalXs[6]),
+        Math.floor(Math.random() * originalXs[7]),
+    ] );
     //const correctAnswer = originalX - originalY;
     const [bobOnBalloon, setBobOnBalloon] = useState(1);
     const [score, setScore] = useState(0);
@@ -167,7 +167,7 @@ const DontDrownBob = ({ onScoreSubmission }) => {
 
             {/* DEATH SCREEN */}
             {death && (
-                <div style={{ position: "absolute", top: "35%", left: "52%", transform: "translate(-50%, -50%)", backgroundColor: "rgba(0, 0, 0, 0.7)", padding: "20px", color: "white", fontSize: "30px" }}>
+                <div style={{ position: "absolute", top: "35%", left: "52%", transform: "translate(-40%, -30%)", backgroundColor: "rgba(0, 0, 0, 0.7)", padding: "20px", color: "white", fontSize: "30px" }}>
                     <h1>Victorious!</h1>
                     <p>Your score: {score}</p>
                     <button
@@ -207,9 +207,10 @@ const DontDrownBob = ({ onScoreSubmission }) => {
 
             {/* Game Over Screen */}
             {gameOver && (
-                <div style={{ position: "absolute", top: "35%", left: "52%", transform: "translate(-50%, -50%)", backgroundColor: "rgba(0, 0, 0, 0.7)", padding: "20px", color: "white", fontSize: "30px" }}>
+                <div style={{ position: "absolute", top: "35%", left: "52%", transform: "translate(-41%, -20%)", backgroundColor: "rgba(0, 0, 0, 0.7)", padding: "20px", color: "white", fontSize: "30px" }}>
                     <h1>Game Over</h1>
                     <p>Your score: {score}</p>
+                    <p style={{fontSize:"20px"}}>Correct Answer for {originalXs[bobOnBalloon]} - {originalYs[bobOnBalloon]} = {originalXs[bobOnBalloon] - originalYs[bobOnBalloon]}</p>
                     <button
                         style={{
                             marginTop: "5%",

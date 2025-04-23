@@ -1,70 +1,84 @@
+// Bob.jsx
 import bob from "../../asset/images/bob2.png";
 import { useEffect, useState } from "react";
 
 const Bob = (props) => {
-    ///////////////////////////////////
-    // Set up widget STATE
-    const dx = parseFloat(props.nextX) - parseFloat(props.x);
-    const dy = parseFloat(props.nextY) - parseFloat(props.y);
-    const len = Math.sqrt(dx * dx + dy * dy);
-    const unitDx = dx / len;
-    const unitDy = dy / len;
+  // 1) initial direction vector
+  const dx0 = parseFloat(props.nextX) - parseFloat(props.x);
+  const dy0 = parseFloat(props.nextY) - parseFloat(props.y);
+  const len0 = Math.hypot(dx0, dy0) || 1;
 
-    const [objectData, setObjectData] = useState({
-        x: parseFloat(props.x),
-        y: parseFloat(props.y),
-        nextX: parseFloat(props.nextX),
-        nextY: parseFloat(props.nextY),
-        deltaX: unitDx,
-        deltaY: unitDy
+  const [objectData, setObjectData] = useState({
+    x: parseFloat(props.x),
+    y: parseFloat(props.y),
+    nextX: parseFloat(props.nextX),
+    nextY: parseFloat(props.nextY),
+    deltaX: dx0 / len0,
+    deltaY: dy0 / len0,
+  });
+
+  // 2) whenever the parent hands down a new target, recalc only the unit vector
+  //    and reset our drift to 0 so we “mount” the new balloon from its top.
+  const [drift, setDrift] = useState(0);
+  useEffect(() => {
+    setObjectData(prev => {
+      const { x, y } = prev;
+      const nextX = parseFloat(props.nextX);
+      const nextY = parseFloat(props.nextY);
+      const dx = nextX - x;
+      const dy = nextY - y;
+      const len = Math.hypot(dx, dy) || 1;
+      return {
+        ...prev,
+        nextX,
+        nextY,
+        deltaX: dx / len,
+        deltaY: dy / len,
+      };
     });
+    setDrift(0);
+  }, [props.nextX, props.nextY]);
 
-    // End set up widget STATE
-    ///////////////////////////////////
+  // 3) movement loop toward nextX/nextY with clamping
+  useEffect(() => {
+    const id = setInterval(() => {
+      setObjectData(prev => {
+        const { x, y, nextX, nextY, deltaX, deltaY } = prev;
+        const rawX = x + deltaX;
+        const rawY = y + deltaY;
+        const newX = deltaX > 0 ? Math.min(rawX, nextX) : Math.max(rawX, nextX);
+        const newY = deltaY > 0 ? Math.min(rawY, nextY) : Math.max(rawY, nextY);
 
-    useEffect(() => {
-        // Ensure that Bob only moves if the nextX, nextY has changed
-        if (objectData.x === objectData.nextX && objectData.y === objectData.nextY) return; // Stop if already at target
+        if (newX === nextX && newY === nextY) clearInterval(id);
+        return { ...prev, x: newX, y: newY };
+      });
+    }, 20);
+    return () => clearInterval(id);
+  }, [props.nextX, props.nextY]);
 
-        const moveBob = () => {
-            // If Bob has reached or passed the destination, stop moving
-            if (objectData.deltaX > 0 && objectData.x >= objectData.nextX) {
-                return;
-            }
+  // 4) drift loop: exactly the same speed your Balloon uses (0.05 per 20 ms)
+  //    it resets every time you jump (because nextX/nextY changed).
+  useEffect(() => {
+    const id2 = setInterval(() => {
+      setDrift(d => d + 0.05);
+    }, 20);
+    return () => clearInterval(id2);
+  }, [props.nextX, props.nextY]);
 
-            // Calculate new position
-            const newX = objectData.x + objectData.deltaX;
-            const newY = objectData.y + objectData.deltaY;
-
-            // Update object data with new position
-            setObjectData((prevState) => ({
-                ...prevState,
-                x: newX,
-                y: newY
-            }));
-        };
-
-        
-        // Set up the interval to move Bob every 20ms
-        const intervalId = setInterval(moveBob, 20);
-        return () => clearInterval(intervalId); // Clean up the interval on component unmount
-    }, [objectData]); // The useEffect now depends on objectData
-
-    return (
-        <div
-            style={{
-                position: "absolute",
-                backgroundImage: `url(${bob})`,
-                height: "240px",
-                width: "140px",
-                backgroundSize: "cover",
-                backgroundPosition: "center bottom",
-                left: objectData.x + "%",
-                top: objectData.y + "%",
-            }}
-        >
-        </div>
-    );
+  return (
+    <div
+      style={{
+        position: "absolute",
+        backgroundImage: `url(${bob})`,
+        height: "240px",
+        width: "140px",
+        backgroundSize: "cover",
+        backgroundPosition: "center bottom",
+        left: `${objectData.x}%`,
+        top:  `${objectData.y + drift}%`,
+      }}
+    />
+  );
 };
 
 export default Bob;
