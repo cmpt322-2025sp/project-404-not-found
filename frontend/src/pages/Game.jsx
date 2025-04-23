@@ -10,7 +10,6 @@ import { character_speed, character_dimension, character_initial_position, islan
 import { useExpressServices } from "../functions/ExpressServicesProvider"
 
 const Game = () => {
-
     const navigate = useNavigate()
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
@@ -20,11 +19,12 @@ const Game = () => {
     const urlRefClassroomId = queryParams.get('classroom')
     const { userId } = useAuth()
     const [loading, setLoading] = useState(true)
+    const [showCongrats, setShowCongrats] = useState(false)
 
     const expressServices = useExpressServices()
     const [csrf, setCSRF] = useState('')
 
-    if(!urlRefAssignmentName || !urlRefAssignmentId || !urlRefClassroomId){
+    if (!urlRefAssignmentName || !urlRefAssignmentId || !urlRefClassroomId) {
         navigate('/assignments')
     }
 
@@ -48,31 +48,46 @@ const Game = () => {
     const [collectedEggs, setCollectedEggs] = useState(0)
 
     useEffect(() => {
-        fetch(PROCESSURL + 'check_assignment_exists_for_student?user_id='+userId+'&'+queryParams, { method: 'GET', credentials: "include" })
+        fetch(PROCESSURL + 'check_assignment_exists_for_student?user_id=' + userId + '&' + queryParams, { method: 'GET', credentials: "include" })
             .then((res) => res.json())
             .then((assignment) => {
-                if(!assignment.exists){
+                if (!assignment.exists) {
                     navigate('/assignments')
-                }else{
+                } else {
                     setScores(assignment.game_string)
                     setCollectedEggs(assignment.eggs_collected)
                     setLoading(false)
+
+                    if (
+                        assignment.game_string["Dont Drown Bob"] > 0 &&
+                        assignment.game_string["Grocery Store"] > 0 &&
+                        assignment.game_string["Bob Cleans"] > 0
+                    ) {
+                        setShowCongrats(true)
+                    }
                 }
             })
-
     }, [navigate])
 
     const handleScoreFromEgg = (game, score) => {
-        if (score === 0){score = 1}
+        if (score === 0) { score = 1 }
 
         const updatedScores = {
             ...scores,
             [game]: score,
         }
         const updatedEggs = collectedEggs + 1
-    
+
         setScores(updatedScores)
         setCollectedEggs(updatedEggs)
+
+        if (
+            updatedScores["Dont Drown Bob"] > 0 &&
+            updatedScores["Grocery Store"] > 0 &&
+            updatedScores["Bob Cleans"] > 0
+        ) {
+            setShowCongrats(true)
+        }
 
         expressServices.autoSaveProgress({ csrf: csrf, game_string: updatedScores, eggs_collected: updatedEggs, assignment_id: urlRefAssignmentId, user_id: userId })
             .then((result) => {
@@ -83,14 +98,13 @@ const Game = () => {
             })
     }
 
-
     const getPixelPosition = (vw, vh) => {
         const widthInPixels = window.innerWidth;
         const heightInPixels = window.innerHeight;
-    
-        const topInPixels = (((vh+20) / 100) * heightInPixels);
-        const leftInPixels = (((vw+15) / 100) * widthInPixels);
-    
+
+        const topInPixels = (((vh + 20) / 100) * heightInPixels);
+        const leftInPixels = (((vw + 15) / 100) * widthInPixels);
+
         return { top: topInPixels, left: leftInPixels };
     };
 
@@ -109,7 +123,6 @@ const Game = () => {
     const object_3 = { top: object_3_position.top, left: object_3_position.left, bottom: object_3_position.top + 20, right: object_3_position.left + 20 }
 
     const checkCollision = (newPosition) => {
-
         const character = {
             top: newPosition.top,
             left: newPosition.left,
@@ -165,7 +178,7 @@ const Game = () => {
         <h2>loading...</h2>
     ) : (
         <Playground assignment={urlRefAssignmentName}>
-            <Character position={character_position} movePlayer={movePlayer} ></Character>
+            <Character position={character_position} movePlayer={movePlayer} />
             {scores["Dont Drown Bob"] === 0 && (
                 <Egg position={object_1_position} is_colliding={is_colliding_1} game="Dont Drown Bob" onScore={handleScoreFromEgg} />
             )}
@@ -175,7 +188,35 @@ const Game = () => {
             {scores["Bob Cleans"] === 0 && (
                 <Egg position={object_3_position} is_colliding={is_colliding_3} game="Bob Cleans" onScore={handleScoreFromEgg} />
             )}
-            <ProgressBar scores={scores} eggs_collected={collectedEggs}></ProgressBar>
+            <ProgressBar scores={scores} eggs_collected={collectedEggs} />
+
+            {showCongrats && (
+                <div
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(0, 0, 0, 0.4)",
+                        display: "flex",
+                        flexDirection: "column", // stack items vertically
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 1000,
+                        fontSize: "3rem",
+                        color: "white",
+                        fontWeight: "bold",
+                        fontFamily: "Comic Sans MS, cursive",
+                        textShadow: "2px 2px 5px black",
+                        pointerEvents: "none",
+                    }}
+                >
+                    <div>🎉 Congratulations! You collected all the eggs! 🎉</div>
+                    <div style={{ marginTop: "1rem" }}>🥚🥚🥚</div>
+                </div>
+            )}
+
         </Playground>
     );
 }

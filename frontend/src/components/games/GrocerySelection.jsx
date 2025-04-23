@@ -1,13 +1,30 @@
-import React, { useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import background from "../../asset/images/background3.png";
 import bobBoard from "../../asset/images/bobBoard.png";
 import bob from "../../asset/images/bob2.png";
 import Question from "./Question";
 import GroceryCheckout from "./GroceryCheckout";
+import { mainMusic, groceryMusic } from "../../utils/bgMusic";
+import startSound from "../../asset/sounds/gameStart.mp3";
 
 export default function GrocerySelection({ onScoreSubmission }) {
   const fruitEmojis = ["🍎", "🍌", "🍊", "🍓", "🍍", "🍉", "🍇", "🍒", "🍑", "🥭"];
-  
+
+  const audioRef = useRef(null);
+  const startSoundRef = useRef(null);
+
+
+  // Set the volume (or do any other one‑time audio tweaks) on mount
+
+  useEffect(() => {
+    mainMusic.pause();            // pause big‑world loop
+    groceryMusic.currentTime = 0; // rewind
+    groceryMusic.play();          // start grocery loop
+
+    // Cleanup: if user exits by closing popup early
+    return () => groceryMusic.pause();
+  }, []);
+
   // We track total attempts - increments after *every* submission (correct or wrong)
   const [attempt, setAttempt] = useState(0);
 
@@ -22,7 +39,7 @@ export default function GrocerySelection({ onScoreSubmission }) {
   //  - "🔴" for skip
   //  - "⚫" is unused / not yet attempted
   const [circles, setCircles] = useState(Array(10).fill("⚫"));
-  
+
   const [showCheckout, setShowCheckout] = useState(false);
 
   // Generate initial question
@@ -81,7 +98,7 @@ export default function GrocerySelection({ onScoreSubmission }) {
       );
       // Subtract points for each wrong attempt
       setScore((prevScore) => prevScore - 50);
-      
+
       // If you want them to move on to next question even if wrong:
       //   just generate new question below like we do for correct
       // If you want them to stay on the same question until correct:
@@ -272,7 +289,15 @@ export default function GrocerySelection({ onScoreSubmission }) {
           </h1>
           {/* "Continue" button that triggers the next game */}
           <button
-            onClick={() => setShowCheckout(true)}
+            onClick={() => {
+              if (startSoundRef.current) {
+                startSoundRef.current.currentTime = 0;
+                startSoundRef.current.play().catch(() => { });
+              }
+
+              // Slight delay to let sound play before switching screens
+              setTimeout(() => setShowCheckout(true), 800);
+            }}
             style={{
               position: "absolute",
               left: "100px",
@@ -288,6 +313,7 @@ export default function GrocerySelection({ onScoreSubmission }) {
           >
             Continue
           </button>
+          <audio ref={startSoundRef} src={startSound} />
         </div>
       )}
 
