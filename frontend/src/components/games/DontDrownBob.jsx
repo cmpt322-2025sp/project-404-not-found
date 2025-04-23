@@ -105,6 +105,15 @@ const DontDrownBob = ({ onScoreSubmission }) => {
 
         }}>
 
+            { !start && !death && !gameOver && (
+                 <Bob
+                 x = {Number(xaxis[bobOnBalloon - 1]) - 5}   // initial draw at balloon N
+                 y = "20"
+                 nextX={Number(xaxis[bobOnBalloon - 1]) -6}  // move 15% to the right
+                 nextY="20"
+               />
+                )}
+
 
             <div style={{
                 backgroundImage: `url(${bridge})`,
@@ -141,7 +150,7 @@ const DontDrownBob = ({ onScoreSubmission }) => {
 
             }}></div>
 
-            {!start && <Bob x="5" y="60" nextX={xaxis[0] - 5} nextY="20" />}
+            {/* {!start && <Bob x="5" y="60" nextX={xaxis[0] - 5} nextY="20" />} */}
 
             {!gameOver && !death && (<input id="answer" style={{
                 position: "absolute",
