@@ -102,68 +102,49 @@ const Classrooms = () => {
 
     return (
         <div>
-            <h2>All Classrooms</h2>
+            <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#222', marginBottom: '20px' }}>
+                📚 All Classrooms
+            </h2>
 
-            <button style={buttonStyle} onClick={() => setShowPopup(true)}>Create New Classroom</button>
-            <br/>
-            <br/>
+            <button style={buttonStyle} onClick={() => setShowPopup(true)}>
+                ➕ Create New Classroom
+            </button>
 
             {showPopup && (
                 <div style={popupStyles}>
                     <div style={popupContentStyles}>
-                        <h3>Create Classroom</h3>
+                        <h3 style={{ marginBottom: '10px' }}>Create Classroom</h3>
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
-                            <div style={{ marginBottom: '15px' }}>
-                                <label htmlFor="classroomName" style={{ fontSize: '14px', color: '#333', display: 'block', marginBottom: '5px' }}>
-                                    Classroom Name
-                                </label>
-                                <input
-                                    type="text"
-                                    name="classroomName"
-                                    id="classroomName"
-                                    required
-                                    value={formData.classroomName}
-                                    onChange={handleChange}
-                                    placeholder="Class 2_2027"
-                                    style={{
-                                        width: '100%',
-                                        padding: '10px',
-                                        border: '1px solid #ccc',
-                                        borderRadius: '4px',
-                                        fontSize: '16px',
-                                        boxSizing: 'border-box',
-                                    }}
-                                />
-                            </div>
+                            <label htmlFor="classroomName" style={{ fontSize: '14px', color: '#333', marginBottom: '5px' }}>
+                                Classroom Name
+                            </label>
+                            <input
+                                type="text"
+                                name="classroomName"
+                                id="classroomName"
+                                required
+                                value={formData.classroomName || ''}
+                                onChange={handleChange}
+                                placeholder="Class 2_2027"
+                                style={{
+                                    padding: '10px',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '6px',
+                                    fontSize: '15px',
+                                    marginBottom: '10px',
+                                }}
+                            />
 
-                            {errors.server_1 && (
-                                <p style={{ color: 'red', fontSize: '14px', marginBottom: '15px' }}>
-                                    {errors.server_1}
-                                </p>
-                            )}
+                            {errors.server_1 && <p style={{ color: 'red' }}>{errors.server_1}</p>}
+                            {errors.processing && <p style={{ color: 'orange' }}>{errors.processing}</p>}
+                            {errors.success && <p style={{ color: 'green' }}>{errors.success}</p>}
 
-                            {errors.processing && (
-                                <p style={{ color: 'yellow', fontSize: '14px', marginBottom: '15px' }}>
-                                    {errors.processing}
-                                </p>
-                            )}
-
-                            {errors.success && (
-                                <p style={{ color: 'green', fontSize: '14px', marginBottom: '15px' }}>
-                                    {errors.success}
-                                </p>
-                            )}
-
-                            <div>
-                                <input
-                                    type="submit"
-                                    value="Create Classroom"
-                                    style={buttonStyle}
-                                />
+                            <div style={{ marginTop: '10px' }}>
+                                <input type="submit" value="Create Classroom" style={{ ...buttonStyle, marginRight: '10px' }} />
                                 <button
                                     type="button"
                                     onClick={() => { setShowPopup(false); setErrors({ processing: false, success: false }) }}
-                                    style={{...buttonStyle, backgroundColor:'#dd0000'}}
+                                    style={{ ...buttonStyle, backgroundColor: '#dd0000' }}
                                 >
                                     Cancel
                                 </button>
@@ -173,37 +154,45 @@ const Classrooms = () => {
                 </div>
             )}
 
+            <br />
+
             {rowsAreLoading ? (
                 <p>Loading...</p>
             ) : (
-
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                    <tr style={{ backgroundColor: '#f4f4f4', textAlign: 'left' }}>
-                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Name of Classroom</th>
-                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Number of Students</th>
-                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {classrooms.map((classroom, index) => (
-                        <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                            <td style={{ padding: '10px' }}>{classroom.name}</td>
-                            <td style={{ padding: '10px' }}>{classroom.students_count}</td>
-                            <td style={{ padding: '10px' }}>
-                                <button style={buttonStyle} 
-                                onClick={() => {navigate(`classroom?classroomName=${classroom.name}&classroom=${classroom._id}`)}} >Access Classroom</button>
-                                {classroom.students_count === 0 && (
-                                    <button style={{...buttonStyle, backgroundColor:'#dd0000'}} onClick={() => {handleDelete(classroom._id)}}>Delete</button>
-                                )}
-                            </td>
+                <table style={tableStyle}>
+                    <thead>
+                        <tr>
+                            <th style={thStyle}>Name of Classroom</th>
+                            <th style={thStyle}>Number of Students</th>
+                            <th style={thStyle}>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-
+                    </thead>
+                    <tbody>
+                        {classrooms.map((classroom, index) => (
+                            <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9f9f9' }}>
+                                <td style={tdStyle}>{classroom.name}</td>
+                                <td style={tdStyle}>{classroom.students_count}</td>
+                                <td style={tdStyle}>
+                                    <button
+                                        style={{ ...buttonStyle, marginRight: '10px' }}
+                                        onClick={() => navigate(`classroom?classroomName=${classroom.name}&classroom=${classroom._id}`)}
+                                    >
+                                        👁️ View
+                                    </button>
+                                    {classroom.students_count === 0 && (
+                                        <button
+                                            style={{ ...buttonStyle, backgroundColor: '#dd0000' }}
+                                            onClick={() => handleDelete(classroom._id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             )}
-
         </div>
     )
 }
@@ -218,30 +207,59 @@ const popupStyles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 1000,
 }
 
 const popupContentStyles = {
-    backgroundColor: 'white',
-    padding: '20px',
-    borderRadius: '5px',
-    width: '300px',
-    textAlign: 'center',
+    backgroundColor: '#fff',
+    padding: '25px',
+    borderRadius: '10px',
+    width: '340px',
+    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+    textAlign: 'left',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'stretch',
     gap: '10px',
 }
 
+const tableStyle = {
+    width: '100%',
+    borderCollapse: 'separate',
+    borderSpacing: 0,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    marginTop: '15px',
+}
+
+const thStyle = {
+    textAlign: 'left',
+    padding: '14px 20px',
+    backgroundColor: '#f0f2f5',
+    fontWeight: '600',
+    fontSize: '15px',
+    color: '#333',
+    borderBottom: '1px solid #ddd',
+}
+
+const tdStyle = {
+    padding: '14px 20px',
+    fontSize: '14px',
+    color: '#555',
+    borderBottom: '1px solid #eee',
+}
+
 const buttonStyle = {
-    padding: '5px 15px',
-    margin: '5px',
+    padding: '8px 16px',
     border: 'none',
-    borderRadius: '4px',
+    borderRadius: '6px',
     backgroundColor: '#0066dd',
     color: '#fff',
     fontSize: '14px',
+    fontWeight: '500',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
+    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
 }
 
 export default Classrooms

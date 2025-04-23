@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import GroceryCheckoutbg from "../../asset/images/GroceryCheckout.png";
-import successSoundFile from "../../asset/sounds/success.wav";
+import successSoundFile from "../../asset/sounds/success.mp3";
 import failSoundFile from "../../asset/sounds/fail.wav";
+import { mainMusic, groceryMusic } from "../../utils/bgMusic";
+import startSound from "../../asset/sounds/gameStart.mp3";
 
 const groceryNames = ["🍊 Oranges", "🍎 Apples", "🍌 Bananas", "🥛 Milk", "🥖 Bread", "🥚 Eggs"];
 
@@ -31,7 +33,7 @@ function ConfettiEffect() {
     >
       {confettiPieces.map((piece) => {
         const left = Math.random() * 100;
-        const delay = Math.random() * 1; 
+        const delay = Math.random() * 1;
         const bgColor = `hsl(${Math.random() * 360}, 80%, 60%)`;
         return (
           <div
@@ -55,6 +57,18 @@ function ConfettiEffect() {
 
 export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
 
+  useEffect(() => {
+    // They arrived here from GrocerySelection, so grocery loop is still going.
+    // Make sure it’s playing (some mobile browsers suspend it on navigation).
+    groceryMusic.play();
+
+    // When this component un‑mounts (they press Continue)…
+    return () => {
+      groceryMusic.pause();   // stop supermarket ambience
+      mainMusic.play();       // bring back the main theme
+    };
+  }, []);
+
   const [groceries] = useState(() => getGroceriesWithRandomPrices());
 
   const [score, setScore] = useState(previousScore);
@@ -68,6 +82,8 @@ export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
 
   const successAudioRef = useRef(null);
   const failAudioRef = useRef(null);
+  const startSoundRef = useRef(null);
+
   const [showConfetti, setShowConfetti] = useState(false);
 
   const handleCheckout = () => {
@@ -98,7 +114,7 @@ export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
   };
 
   const submitScore = () => {
-      onScoreSubmission(Math.round((score/2000)*100))
+    onScoreSubmission(Math.round((score / 2000) * 100))
   }
 
   useEffect(() => {
@@ -263,7 +279,16 @@ export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
               }}
               onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
               onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
-              onClick={submitScore}
+              onClick={() => {
+                if (startSoundRef.current) {
+                  startSoundRef.current.currentTime = 0;
+                  startSoundRef.current.play().catch(() => { });
+                }
+                setTimeout(() => {
+                  submitScore();
+                }, 800); // slight delay to let sound play
+              }}
+
             >
               Continue
             </button>
@@ -282,6 +307,7 @@ export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
           )}
         </div>
       </div>
+      <audio ref={startSoundRef} src={startSound} />
     </>
   );
 }
