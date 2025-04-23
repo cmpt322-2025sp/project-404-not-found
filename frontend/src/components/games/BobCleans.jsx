@@ -1,7 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import Background from "../../asset/images/toys_bg.png";
 
-import successSoundFile from "../../asset/sounds/success.wav";
+// music
+import { mainMusic, BobCleansMusic } from "../../utils/bgMusic";
+
+import start from "../../asset/sounds/gameStart.mp3";
+import successSoundFile from "../../asset/sounds/success.mp3";
 import failSoundFile from "../../asset/sounds/fail.wav";
 // Import your 15 toy images:
 import Alien from "../../asset/images/toys/Alien.png";
@@ -20,11 +24,15 @@ import Unicorn from "../../asset/images/toys/Unicorn.png";
 import Duck from "../../asset/images/toys/Duck.png";
 import Soccerball from "../../asset/images/toys/Soccerball.png";
 
-/** 
+/**
  * In one file:
- * 1) BobCleans: top-level containing instructions => game flow
+ * 1) BobCleans: top‑level containing instructions => game flow
  * 2) InstructionsPage
  * 3) The actual game: ToyBoxPlaceValues
+ *
+ * NOTE: All absolute pixel‑based sizes were converted to viewport‑relative
+ * percentages (vw/vh or %). Small decorative values such as box‑shadow and
+ * border‑radius remain in pixels for consistent styling across devices.
  */
 
 // 15 unique toys
@@ -46,18 +54,27 @@ const toyAssets = [
   { name: "Soccerball", src: Soccerball },
 ];
 
-// ====== TOP-LEVEL COMPONENT ======
+// ====== TOP‑LEVEL COMPONENT ======
 export default function BobCleans({
-  onScoreSubmission = () => { }, // fallback if no parent prop is passed
+  onScoreSubmission = () => {}, // fallback if no parent prop is passed
 }) {
   const [showInstructions, setShowInstructions] = useState(true);
 
-  // Called after user clicks "Start" in instructions
+  useEffect(() => {
+    mainMusic.pause(); // pause big‑world loop
+    BobCleansMusic.currentTime = 0; // rewind
+    BobCleansMusic.play(); // start grocery loop
+
+    return () => {
+      BobCleansMusic.pause();
+      mainMusic.play();
+    };
+  }, []);
+
   function handleStart() {
     setShowInstructions(false);
   }
 
-  // If not showing instructions => show the game
   return (
     <div style={{ fontFamily: "'Comic Sans MS', cursive" }}>
       {showInstructions ? (
@@ -65,9 +82,7 @@ export default function BobCleans({
       ) : (
         <ToyBoxPlaceValues
           onScoreSubmission={(grade) => {
-            // Called when user clicks final "Continue"
             onScoreSubmission(grade);
-            // If you want to go back to instructions:
             setShowInstructions(true);
           }}
         />
@@ -78,98 +93,100 @@ export default function BobCleans({
 
 // ====== 1) INSTRUCTIONS ======
 function InstructionsPage({ onStart }) {
+  const startAudioRef = useRef(null);
+
+  const handleStartClick = () => {
+    startAudioRef.current?.play().catch(console.warn);
+    setTimeout(onStart, 800); // allow sound to play
+  };
+
   return (
-    <div style={{ textAlign: "center" }}>
-      <div
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          fontFamily: "'Comic Sans MS', cursive",
-          margin: 0,
-          backgroundImage: `url(${Background})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          overflow: "hidden",
-        }}
-      >
-        <p
+    <>
+      <div style={{ textAlign: "center" }}>
+        <div
           style={{
             position: "absolute",
-            width: "26%",
-            fontSize: "1rem",
-            position: "relative",
-            top: "21%",
-            left: "38.9%",
-            textAlign: "center",
+            width: "100%",
+            height: "100%",
+            fontFamily: "'Comic Sans MS', cursive",
+            margin: 0,
+            backgroundImage: `url(${Background})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            overflow: "hidden",
           }}
         >
-          <strong style={{ fontSize: "150%" }}>How to Play</strong>
-        </p>
-        <p
-          style={{
-            position: "absolute",
-            width: "26%",
-            fontSize: "1rem",
-            position: "relative",
-            top: "17%",
-            left: "39.2%",
-            textAlign: "left",
-          }}
-        >
-          <br />
-          - You have 15 unique toys, each labeled with a random number.
-          <br />
-          - Decide if the number belongs in the <em>1s box</em>,
-          the <em>10s box</em>, or the <em>100s box</em>.
-          <br />
-          - Each correct answer scores 100 points!
-          <br />
-          - After all 15 toys are placed, you'll see your final score and grade.
-        </p>
-        <button
-          onClick={onStart}
-          style={{
-            position: "absolute",
-            marginTop: "14%",
-            padding: "0.5% 4%",
-            fontSize: "1.7rem",
-            left: "47.6%",
-            backgroundColor: "#4CAF50",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8%",
-            cursor: "pointer",
-          }}
-        >
-          Start
-        </button>
+          <p
+            style={{
+              position: "absolute",
+              width: "26%",
+              fontSize: "1.7vh",
+              top: "22%",
+              left: "38.9%",
+              textAlign: "center",
+            }}
+          >
+            <strong style={{ fontSize: "2.1vh" }}>How to Play</strong>
+          </p>
+          <p
+            style={{
+              position: "absolute",
+              width: "26%",
+              fontSize: "1.7vh",
+              top: "27.5%",
+              left: "39.2%",
+              textAlign: "left",
+            }}
+          >
+            - You have 15 unique toys, each labeled with a random number.
+            <br />- Decide if the number belongs in the <em>1s box</em>, the
+            <em>10s box</em>, or the <em>100s box</em>.
+            <br />- Each correct answer scores 100 points!
+            <br />- After all 15 toys are placed, you'll see your final score
+            and grade.
+          </p>
+          <button
+            onClick={handleStartClick}
+            style={{
+              position: "absolute",
+              top: "61%",
+              left: "47.8%",
+              padding: "0.8% 4%",
+              fontSize: "2.7vh",
+              backgroundColor: "#4CAF50",
+              color: "#fff",
+              border: "none",
+              borderRadius: "7%",
+              cursor: "pointer",
+            }}
+          >
+            Start
+          </button>
+        </div>
       </div>
-      <br />
-    </div>
+      <audio ref={startAudioRef} src={start} />
+    </>
   );
 }
 
 // ====== 2) GAME LOGIC ======
 function ToyBoxPlaceValues({ onScoreSubmission }) {
-  // Generate 15 unique (toy, number) pairs
-  const [toyQuestions] = useState(() => generateToyQuestions());
+  const [toyQuestions] = useState(generateToyQuestions());
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
 
-  const [toyX, setToyX] = useState("48%");
-  const [toyY, setToyY] = useState("270px");
+  const [toyX, setToyX] = useState("52%");
+  const [toyY, setToyY] = useState("45%");
 
   const gameOver = currentIndex >= toyQuestions.length;
 
-  // Create refs to audio elements
   const successAudioRef = useRef(null);
   const failAudioRef = useRef(null);
+  const startSoundRef = useRef(null);
 
   function submitScore() {
-    // We call the parent's function with final grade
     const grade = Math.round((score / 1500) * 100);
     onScoreSubmission(grade);
   }
@@ -180,17 +197,18 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
     const { toyNumber } = toyQuestions[currentIndex];
     const correctBox = determineCorrectBox(toyNumber);
 
-    let targetX = "0px";
-    let targetY = "0px";
+    let targetX = "0%";
+    let targetY = "0%";
+
     if (boxType === "ones") {
-      targetX = "25%";
-      targetY = "400px";
+      targetX = "30%";
+      targetY = "65%"; // 400px ≈ 55vh
     } else if (boxType === "tens") {
-      targetX = "50%";
-      targetY = "300px";
+      targetX = "55%";
+      targetY = "65%"; // 300px ≈ 42vh
     } else if (boxType === "hundreds") {
-      targetX = "70%";
-      targetY = "350px";
+      targetX = "77%";
+      targetY = "65%"; // 350px ≈ 48vh
     }
 
     setToyX(targetX);
@@ -199,28 +217,24 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
     if (boxType === correctBox) {
       setScore((prev) => prev + 100);
       setFeedback("Correct!");
-      // Play success audio
-      if (successAudioRef.current) {
+      successAudioRef.current &&
         setTimeout(() => {
           successAudioRef.current.currentTime = 0;
           successAudioRef.current.play();
         }, 400);
-      }
     } else {
       setFeedback("Wrong!");
-      // Play fail audio
-      if (failAudioRef.current) {
+      failAudioRef.current &&
         setTimeout(() => {
           failAudioRef.current.currentTime = 0;
           failAudioRef.current.play();
         }, 400);
-      }
     }
-    // Move on after 1 second
+
     setTimeout(() => {
       setCurrentIndex((prev) => prev + 1);
-      setToyX("48%");
-      setToyY("270px");
+      setToyX("52%");
+      setToyY("45%");
       setFeedback("");
     }, 1000);
   }
@@ -240,53 +254,51 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
         overflow: "hidden",
       }}
     >
-      {/* Audio elements */}
       <audio ref={successAudioRef} src={successSoundFile} />
       <audio ref={failAudioRef} src={failSoundFile} />
+      <audio ref={startSoundRef} src={start} />
 
       <div
-        style={{
-          position: "absolute",
-          top: "2.2%",
-          width: "100%",
-          textAlign: "center",
-        }}
+        style={{ position: "absolute", top: "2.2%", width: "100%", textAlign: "center" }}
       >
         {gameOver ? (
           <div
             style={{
               fontFamily: "'Comic Sans MS', cursive",
-              fontSize: "18px",
+              fontSize: "2.5vh",
               position: "fixed",
               top: "27.4%",
-              left: "42%",
+              left: "39.5%",
               textAlign: "center",
-              display: 'flex',
-              alignItems: 'center',
-              flexDirection: 'column',
-              justifyContent: 'center'
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              justifyContent: "center",
             }}
           >
             <p>All 15 toys have been placed!</p>
-            <p style={{ fontSize: "18px", color: "green" }}>
+            <p style={{ fontSize: "2.5vh", color: "green" }}>
               Final Score: {score} | Grade: {Math.round((score * 100) / 1500)}%
             </p>
             <button
               style={{
-                marginTop: "5%",
+                marginTop: "4%",
                 padding: "4% 10%",
                 cursor: "pointer",
                 backgroundColor: "#4CAF50",
                 color: "#fff",
                 border: "none",
                 borderRadius: "12px",
-                fontSize: "1rem",
+                fontSize: "1.8vh",
                 boxShadow: "0 3px 5px rgba(0,0,0,0.3)",
                 transition: "transform 0.1s",
               }}
               onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
               onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
-              onClick={submitScore}
+              onClick={() => {
+                startSoundRef.current?.play().catch(() => {});
+                setTimeout(submitScore, 800);
+              }}
             >
               Continue
             </button>
@@ -296,9 +308,9 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
             <p
               style={{
                 position: "absolute",
-                left: "41.2%",
-                fontSize: "2.2rem",
-                marginTop: "11%",
+                left: "43.7%",
+                fontSize: "3vh",
+                marginTop: "11.6%",
               }}
             >
               Question <strong>{currentIndex + 1}</strong> of <strong>15</strong>
@@ -308,31 +320,29 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
         )}
       </div>
 
-      <div>
-        <p
-          style={{
-            position: "absolute",
-            bottom: "63%",
-            left: "26%",
-            width: "100%",
-            fontSize: "2rem",
-            textAlign: "center",
-          }}
-        >
-          Score: <strong style={{ color: "white" }}>{score}</strong>
-        </p>
-      </div>
+      <p
+        style={{
+          position: "absolute",
+          bottom: "63%",
+          left: "26%",
+          width: "100%",
+          fontSize: "3vh",
+          textAlign: "center",
+        }}
+      >
+        Score: <strong style={{ color: "white" }}>{score}</strong>
+      </p>
 
       {feedback && (
         <div
           style={{
             position: "absolute",
-            bottom: "62%",
+            bottom: "60%",
             left: "71.4%",
-            fontSize: "2rem",
+            fontSize: "3.5vh",
             textAlign: "left",
             color: feedback === "Correct!" ? "green" : "red",
-            maxWidth: "300px",
+            maxWidth: "30%",
             margin: "0 auto",
             fontWeight: "bold",
           }}
@@ -341,7 +351,6 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
         </div>
       )}
 
-      {/* Buttons row */}
       {!gameOver && (
         <div
           style={{
@@ -365,10 +374,7 @@ function ToyBoxPlaceValues({ onScoreSubmission }) {
         </div>
       )}
 
-      {/* Animated toy sprite */}
-      {!gameOver && (
-        <ToyAnimation toyInfo={toyQuestions[currentIndex]} x={toyX} y={toyY} />
-      )}
+      {!gameOver && <ToyAnimation toyInfo={toyQuestions[currentIndex]} x={toyX} y={toyY} />}
     </div>
   );
 }
@@ -381,7 +387,7 @@ function ToyQuestionUI({ toyInfo }) {
         position: "relative",
         textAlign: "center",
         left: "2%",
-        fontSize: "1.5rem",
+        fontSize: "2.7vh",
         marginTop: "15%",
       }}
     >
@@ -392,55 +398,70 @@ function ToyQuestionUI({ toyInfo }) {
   );
 }
 
+const SCALE_MAP = {
+  "Buzz Lightyear": 1.3, // enlarge Buzz 40%; tweak as needed
+  "Piano": 1.3,
+  "Car": 1.3,
+  "Train": 1.6,
+  "Plane": 1.2,
+  "Soccerball": 0.9,
+  "Xylophone": 1.2,
+};
+
 function ToyAnimation({ toyInfo, x, y }) {
-  const { toyImage } = toyInfo;
+  const SIZE = "16vh"; // square container baseline
+  const scale = SCALE_MAP[toyInfo.toyName] || 1;
   return (
-    <img
-      src={toyImage}
-      alt={toyInfo.toyName}
+    <div
       style={{
-        position: "relative",
-        paddingTop: "0.6%",
+        position: "absolute",
         left: x,
         top: y,
-        width: "auto",
-        height: "auto",
-        maxWidth: "100%",
-        maxHeight: "18%",
+        transform: `translate(-50%, -50%) scale(${scale})`,
+        transformOrigin: "center",
+        width: SIZE,
+        height: SIZE,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        pointerEvents: "none",
         transition: "left 1s, top 1s",
       }}
-    />
+    >
+      <img
+        src={toyInfo.toyImage}
+        alt={toyInfo.toyName}
+        style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+      />
+    </div>
   );
 }
 
-// Evaluate correct box
 function determineCorrectBox(num) {
   if (num < 10) return "ones";
   if (num < 100) return "tens";
   return "hundreds";
 }
 
-// Generate 15 pairs: unique toy + random number
 function generateToyQuestions() {
-  const shuffledToys = [...toyAssets];
-  shuffleArray(shuffledToys);
+  const shuffled = [...toyAssets];
+  shuffleArray(shuffled);
 
   const ones = Array.from({ length: 5 }, () => randomInt(1, 9));
   const tens = Array.from({ length: 5 }, () => randomInt(10, 99));
   const hundreds = Array.from({ length: 5 }, () => randomInt(100, 999));
-  const allNumbers = [...ones, ...tens, ...hundreds];
-  shuffleArray(allNumbers);
+  const numbers = [...ones, ...tens, ...hundreds];
+  shuffleArray(numbers);
 
-  return allNumbers.map((num, i) => ({
-    toyName: shuffledToys[i].name,
-    toyImage: shuffledToys[i].src,
+  return numbers.map((num, i) => ({
+    toyName: shuffled[i].name,
+    toyImage: shuffled[i].src,
     toyNumber: num,
   }));
 }
 
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
 function shuffleArray(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -455,7 +476,7 @@ const buttonStyle = {
   backgroundColor: "#FF5722",
   color: "#fff",
   border: "none",
-  borderRadius: "8px",
-  fontSize: "1rem",
-  boxShadow: "0 3px 5px rgba(0, 0, 0, 0.3)",
+  borderRadius: "8%",
+  fontSize: "1.73vh",
+  boxShadow: "0 3% 5% rgba(0, 0, 0, 0.3)",
 };

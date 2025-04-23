@@ -75,7 +75,7 @@ const LoginForm = () => {
                     padding: '40px',
                     borderRadius: '20px',
                     boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
-                    width: '400px',
+                    width: '430px',
                     textAlign: 'center',
                     position: 'relative',
                     animation: 'popIn 1s ease-out'
