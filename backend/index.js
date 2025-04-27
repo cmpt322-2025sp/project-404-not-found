@@ -12,7 +12,7 @@ const port = process.env.PORT || process.env.EXPRESS_PORT;
 const routes = require('./routes');
 
 app.use(cors({
-    origin: true,
+    origin: process.env.FRONTEND_URL,
     credentials: true,
 }));
 
