@@ -27,7 +27,6 @@ const postLogin = async (req, res) => {
                 res.json({ loggedIn: false, error: login.error });
             }
         } catch (error) {
-            console.log(error)
             res.status(500).json({ error: 'Server error during login.' });
         }
     } else {
