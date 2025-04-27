@@ -5,6 +5,7 @@ const { UpdateDocument } = require("../core/DatabaseFunctions");
 const postLogin = async (req, res) => {
     if (req.headers.origin === process.env.FRONTEND_URL) {
         try {
+            console.log("FIRST LINE")
             const login = await UserFunctions.loginUser(req.body.email, req.body.h_password);
 
             console.log(login)
