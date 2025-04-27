@@ -285,6 +285,66 @@ const ExpressServicesProvider = ({ children }) =>{
         })
     }
 
+    const changeStudentData = (data) => {
+        return fetch(PROCESSURL + 'change_student_data', { 
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                csrf: data.csrf
+            },
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return true
+            }else{
+                return JSON.stringify(response)
+            }
+        })
+    }
+
+    const deleteStudent = (data) => {
+        return fetch(PROCESSURL + 'delete_student', {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                csrf: data.csrf
+            },
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return true
+            }else{
+                return false
+            }
+        })
+    }
+
+    const retrieveStudentRecords = (data) => {
+        return fetch(PROCESSURL + 'retrieve_student_records', {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                csrf: data.csrf
+            },
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return {assignmentRecords: response.assignmentRecords, studentInfo: response.studentInfo}
+            }else{
+                return JSON.stringify(response)
+            }
+        })
+    }
+
     return (
         <ExpressServicesContext.Provider value={{ 
             createClassroom, 
@@ -300,7 +360,10 @@ const ExpressServicesProvider = ({ children }) =>{
             retrieveAssignmentCompletions,
             changeAssignmentDueDate,
             deleteAssignment,
-            changeClassroomName
+            changeClassroomName,
+            changeStudentData,
+            deleteStudent,
+            retrieveStudentRecords
         }}>{children}</ExpressServicesContext.Provider>
     );
 

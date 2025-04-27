@@ -6,6 +6,7 @@ router.get('/muffin/:crumble',controller.getMuffin)
 router.post('/login',controller.postLogin)
 router.get('/logout',controller.getLogout)
 router.get('/check_classroom_exists',controller.getClassroom)
+router.get('/check_student_exists',controller.getStudent)
 router.post('/create_classroom',controller.postCreateClassroom)
 router.post('/retrieve_classrooms',controller.postRetrieveClassrooms)
 router.post('/delete_classroom',controller.postDeleteClassroom)
@@ -22,5 +23,8 @@ router.post('/retrieve_completions_for_assignment',controller.postRetrieveComple
 router.post('/change_due_date',controller.postChangeAssignmentDue)
 router.post('/delete_assignment',controller.postDeleteAssignment)
 router.post('/change_classroom_name',controller.postChangeClassroomName)
+router.post('/change_student_data',controller.postChangeStudentData)
+router.post('/delete_student',controller.postDeleteStudent)
+router.post('/retrieve_student_records',controller.postRetrieveStudentRecords)
 
 module.exports = router;
