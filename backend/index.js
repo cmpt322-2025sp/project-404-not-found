@@ -20,7 +20,11 @@ app.use(session({
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: new MongoDBStore({ uri: MONGODB_URI, collection: process.env.MONGO_SESSIONS })
+    store: new MongoDBStore({ uri: MONGODB_URI, collection: process.env.MONGO_SESSIONS }),
+    cookie: {
+        sameSite: 'none',
+        secure: true
+    }
 }));
 
 app.use(express.json());
