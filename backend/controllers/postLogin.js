@@ -7,18 +7,25 @@ const postLogin = async (req, res) => {
         try {
             const login = await UserFunctions.loginUser(req.body.email, req.body.h_password);
 
+            console.log(login)
+
             if (login.authenticated) {
+                console.log("AUTHENTICATED")
                 const payload = {
                     userId: login.user_id,
                     userFirstName: login.first_name,
                     isAdmin: login.admin
                 };
+                console.log(payload)
 
                 const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '2h' });
+                console.log("GOT TOKEN")
+                console.log(token)
 
                 if (login.user_id > 0) {
                     await UpdateDocument('users', { email: req.body.email }, { last_login: new Date() });
                 }
+                console.log("last step")
 
                 res.json({ loggedIn: true, adminLoggedIn: login.admin, userId: login.user_id, userFirstName: login.first_name, token: token });
             } else {
