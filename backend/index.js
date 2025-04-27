@@ -11,6 +11,8 @@ const app = express();
 const port = process.env.PORT || process.env.EXPRESS_PORT;
 const routes = require('./routes');
 
+app.set('trust proxy', 1);
+
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
@@ -23,7 +25,9 @@ app.use(session({
     store: new MongoDBStore({ uri: MONGODB_URI, collection: process.env.MONGO_SESSIONS }),
     cookie: {
         sameSite: 'none',
-        secure: true
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        httpOnly: true
     }
 }));
 
