@@ -91,9 +91,7 @@ const Assignment = () => {
 
     return (
         <div>
-            <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#222', marginBottom: '20px' }}>
-                📄 Assignments / {assignmentName}
-            </h2>
+            <h2>📄 <span onClick={() => navigate(`/admin/assignments`)} style={{cursor: 'pointer'}}>Assignments</span> / {assignmentName}</h2>
 
             <div style={assignmentInfoBox}>
                 <h3 style={infoHeadingStyle}>📌 Assignment Info</h3>

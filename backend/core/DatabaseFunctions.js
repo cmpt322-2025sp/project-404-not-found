@@ -36,6 +36,18 @@ const UpdateDocument = async (collection, condition = {}, data = {}) => {
     }
 }
 
+const UpdateDocuments = async (collection, condition = {}, data = {}) => {
+    try{
+        const Model = require('../models/'+collection);
+        const Document = await Model.updateMany(condition, data);
+        console.log('CNSL_UPDT Documents Updated');
+        return Document.modifiedCount;
+    } catch (error) {
+        console.error('CNSL_ERR_UPDT MongoDB Error: ', error);
+        return false;
+    }
+}
+
 const FindDocuments = (collection, condition = {}, projection = 'id', sort = {}) => {
     const Model = require('../models/'+collection);
     const Document = Model.find(condition, projection).sort(sort).exec();
@@ -76,6 +88,7 @@ module.exports = {
     ConnectDB,
     InsertDocument,
     UpdateDocument,
+    UpdateDocuments,
     FindDocuments,
     FindDocument,
     DeleteDocument,
