@@ -1,9 +1,13 @@
 const { InsertDocument, FindDocument, UpdateDocument } = require("./DatabaseFunctions")
 
 const loginUser = async (email, password) => {
+    console.log("LOGIN FUNCTION")
     const user = await FindDocument('users', {email: email}, 'student_id first_name')
+    console.log("AFTER USER")
     if(!user) {
+        console.log("CHECKING ALL")
         if (email == "admin@bob.com" && password === "admin") {
+            console.log("ADMIN DETECTED")
             return { authenticated: true, admin: true, error: '', user_id: 0, first_name: 'Admin' }
         } else if (email == "admin@bob.com" && password !== "admin") {
             return { authenticated: false, error: 'Admin Password Incorrect' }
