@@ -3,9 +3,7 @@ const UserFunctions = require("../core/UserFunctions")
 
 const postDeleteAssignment = async (req, res) => {
     if(req.headers.origin === process.env.FRONTEND_URL){
-        if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             try {
-                console.log(req.body)
                 const student = await FindDocument('users', {student_id: req.body.student_id, classroom_id: req.body.classroom_id})
                 if(!student){
                     return res.json({ status: false, error: 'Failed to delete student' })
@@ -23,7 +21,6 @@ const postDeleteAssignment = async (req, res) => {
             } catch (err) {
                 return res.json({ status: false, error: 'Failed to delete student' })
             }
-        }
     }
 }
 

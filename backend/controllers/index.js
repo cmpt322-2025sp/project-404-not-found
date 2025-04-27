@@ -1,8 +1,6 @@
 module.exports = {
-    getCSRF     : require('./getCSRF'),
     getMuffin   : require('./getMuffin'),
     postLogin   : require('./postLogin'),
-    getLogout   : require('./getLogout'),
     getClassroom : require('./getClassroom'),
     getAssignment : require('./getAssignment'),
     getAssignmentExists : require('./getAssignmentExists'),

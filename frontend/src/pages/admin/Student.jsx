@@ -14,7 +14,6 @@ const Student = () => {
     const studentName = queryParams.get('studentFN') + ' ' + queryParams.get('studentLN')
 
     const expressServices = useExpressServices()
-    const [csrf, setCSRF] = useState('')
     const [errors, setErrors] = useState({ processing: false, success: false })
     const [rowsAreLoading, setRowsAreLoading] = useState(true)
     const [assignmentRecords, setAssignmentRecords] = useState([])
@@ -22,7 +21,8 @@ const Student = () => {
 
 
     useEffect(() => {
-        fetch(PROCESSURL + 'check_classroom_exists?'+queryParams, { method: 'GET', credentials: "include" })
+        const token = localStorage.getItem('token')
+        fetch(PROCESSURL + 'check_classroom_exists?'+queryParams, { method: 'GET', credentials: "include", headers: {'Authorization': `Bearer ${token}`} })
             .then((res) => res.json())
             .then((classroom) => {
                 if(!classroom.exists){
@@ -32,7 +32,8 @@ const Student = () => {
     }, [navigate])
 
     useEffect(() => {
-        fetch(PROCESSURL + 'check_student_exists?' + queryParams, { method: 'GET', credentials: "include" })
+        const token = localStorage.getItem('token')
+        fetch(PROCESSURL + 'check_student_exists?' + queryParams, { method: 'GET', credentials: "include", headers: {'Authorization': `Bearer ${token}`} })
             .then((res) => res.json())
             .then((classroom) => {
                 if (!classroom.exists) {
@@ -42,27 +43,21 @@ const Student = () => {
     }, [navigate])
 
     useEffect(() => {
-        fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-            .then((res) => res.json())
-            .then((response) => {
-                setCSRF(response.csrf)
-                return expressServices.retrieveStudentRecords({csrf:response.csrf, student_id: studentId, class_id: classroomId})
+        expressServices.retrieveStudentRecords({student_id: studentId, class_id: classroomId})
+        .then((records) => {
+            if (records.error) {
+                setErrors({ server_1: records.error })
+            }else{
+                setAssignmentRecords(records.assignmentRecords)
+                setStudentInfo(records.studentInfo)
+                setRowsAreLoading(false)
+            }
+        })
+        .catch((err) => {
+            setErrors({ server_1: err.error })
             })
-            .then((records) => {
-                if (records.error) {
-                    setErrors({ server_1: records.error })
-                }else{
-                    setAssignmentRecords(records.assignmentRecords)
-                    setStudentInfo(records.studentInfo)
-                    setRowsAreLoading(false)
-                    console.log(records)
-                }
-            })
-            .catch((err) => {
-                setErrors({ server_1: err.error })
-                })
     
-        }, [])
+        }, [studentId, classroomId])
 
 
     const today = new Date().toLocaleDateString('en-US', {

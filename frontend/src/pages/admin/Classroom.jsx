@@ -17,7 +17,6 @@ const Classroom = () => {
     const [csvData, setCsvData] = useState([])
     const [loading, setLoading] = useState(false)
     const expressServices = useExpressServices()
-    const [csrf, setCSRF] = useState('')
     const [errors, setErrors] = useState({ processing: false, success: false })
     const [students, setStudents] = useState([])
     const [rowsAreLoading, setRowsAreLoading] = useState(true)
@@ -29,7 +28,8 @@ const Classroom = () => {
     const [currentlyEditingStudent, setCurrentlyEditingStudent] = useState({})
 
     useEffect(() => {
-        fetch(PROCESSURL + 'check_classroom_exists?'+queryParams, { method: 'GET', credentials: "include" })
+        const token = localStorage.getItem('token')
+        fetch(PROCESSURL + 'check_classroom_exists?'+queryParams, { method: 'GET', credentials: "include", headers: {'Authorization': `Bearer ${token}`} })
             .then((res) => res.json())
             .then((classroom) => {
                 if(!classroom.exists){
@@ -40,22 +40,17 @@ const Classroom = () => {
     }, [navigate])
 
     useEffect(() => {
-        fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-            .then((res) => res.json())
-            .then((response) => {
-                setCSRF(response.csrf)
-                return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
-            })
-            .then((studentsData) => {
-                setStudents(studentsData.students)
-                setClassroomInfo(studentsData.classroom)
-                setRowsAreLoading(false)
-            })
-            .catch((err) => {
-                alert(err.error)
-            })
+        expressServices.retrieveStudents({ classroomId: classroomId })
+        .then((studentsData) => {
+            setStudents(studentsData.students)
+            setClassroomInfo(studentsData.classroom)
+            setRowsAreLoading(false)
+        })
+        .catch((err) => {
+            alert(err.error)
+        })
 
-    }, [])
+    }, [classroomId])
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0]
@@ -83,26 +78,21 @@ const Classroom = () => {
         e.preventDefault()
 
         if (csvData.length > 0) {
-            expressServices.uploadClassroomCSV({classroomId: classroomId, csrf: csrf, csvData: csvData})
+            expressServices.uploadClassroomCSV({classroomId: classroomId, csvData: csvData})
                 .then((result) => {
                     if (result.error) {
                         setErrors({ server_1: result.error })
                     } else {
-                        fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                            .then((res) => res.json())
-                            .then((response) => {
-                                setCSRF(response.csrf)
-                                return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
-                            })
-                            .then((studentsData) => {
-                                setStudents(studentsData.students)
-                                setClassroomInfo(studentsData.classroom)
-                                setCsvData([])
-                                setErrors({ success: "Student Accounts Created" })
-                            })
-                            .catch((err) => {
-                                alert("Failed to fetch students after creation.");
-                            })
+                        expressServices.retrieveStudents({ classroomId: classroomId })
+                        .then((studentsData) => {
+                            setStudents(studentsData.students)
+                            setClassroomInfo(studentsData.classroom)
+                            setCsvData([])
+                            setErrors({ success: "Student Accounts Created" })
+                        })
+                        .catch((err) => {
+                            alert("Failed to fetch students after creation.");
+                        })
                     }
                 })
                 .catch((error) => {
@@ -121,28 +111,22 @@ const Classroom = () => {
     const handleAddStudentForm = (event) => {
         setErrors({ processing: "Please Wait..." })
         event.preventDefault();
-        formData['csrf'] = csrf;
         formData['classroomId'] = classroomId;
         expressServices.addStudent(formData)
         .then((result) => {
             if (!result.status) {
                 setErrors({ server_1: result.error })
             } else {
-                fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                    .then((res) => res.json())
-                    .then((response) => {
-                        setCSRF(response.csrf)
-                        return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
-                    })
-                    .then((studentsData) => {
-                        setStudents(studentsData.students)
-                        setClassroomInfo(studentsData.classroom)
-                        setFormData({})
-                        setErrors({ success: "Student Account Created" })
-                    })
-                    .catch((err) => {
-                        alert("Failed to fetch students after creation.");
-                    })
+                expressServices.retrieveStudents({classroomId: classroomId })
+                .then((studentsData) => {
+                    setStudents(studentsData.students)
+                    setClassroomInfo(studentsData.classroom)
+                    setFormData({})
+                    setErrors({ success: "Student Account Created" })
+                })
+                .catch((err) => {
+                    alert("Failed to fetch students after creation.");
+                })
             }
         })
         .catch((error) => {
@@ -154,7 +138,6 @@ const Classroom = () => {
     const handleNameChangeSubmit = (event) => {
         setErrors({ processing: "Please Wait..." })
         event.preventDefault();
-        formData['csrf'] = csrf;
         formData['classroomId'] = classroomId;
         expressServices.changeClassroomName(formData)
         .then((result) => {
@@ -162,23 +145,18 @@ const Classroom = () => {
                 setErrors({ server_1: JSON.parse(result).error })
             } else {
                 // setRowsAreLoading(true)
-                fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                    .then((res) => res.json())
-                    .then((response) => {
-                        setCSRF(response.csrf)
-                        return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
-                    })
-                    .then((studentsData) => {
-                        setStudents(studentsData.students)
-                        setClassroomInfo(studentsData.classroom)
-                        setFormData({})
-                        setErrors({ success: "Classroom Name Updated" })
-                        navigate(`/admin/classroom?classroomName=${encodeURIComponent(formData['newClassroomName'])}&classroom=${classroomId}`)
-                        // setRowsAreLoading(false)
-                    })
-                    .catch((err) => {
-                        alert("Failed to fetch students after classroom update.");
-                    })
+                expressServices.retrieveStudents({ classroomId: classroomId })
+                .then((studentsData) => {
+                    setStudents(studentsData.students)
+                    setClassroomInfo(studentsData.classroom)
+                    setFormData({})
+                    setErrors({ success: "Classroom Name Updated" })
+                    navigate(`/admin/classroom?classroomName=${encodeURIComponent(formData['newClassroomName'])}&classroom=${classroomId}`)
+                    // setRowsAreLoading(false)
+                })
+                .catch((err) => {
+                    alert("Failed to fetch students after classroom update.");
+                })
             }
         })
         .catch((error) => {
@@ -204,7 +182,6 @@ const Classroom = () => {
     const handleEditStudentSubmit = (event) => {
         setErrors({ processing: "Please Wait..." })
         event.preventDefault();
-        formData['csrf'] = csrf;
         formData['classroomId'] = classroomId;
         formData['student_id'] = currentlyEditingStudent.student_id;
         formData['student_email'] = currentlyEditingStudent.student_email;
@@ -214,28 +191,22 @@ const Classroom = () => {
         if(!formData.last_name){
             formData['last_name'] = currentlyEditingStudent.last_name;
         }
-        console.log(formData)
         expressServices.changeStudentData(formData)
         .then((result) => {
             if (JSON.parse(result).status === false) {
                 setErrors({ server_1: JSON.parse(result).error })
             } else {
-                fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                    .then((res) => res.json())
-                    .then((response) => {
-                        setCSRF(response.csrf)
-                        return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
-                    })
-                    .then((studentsData) => {
-                        setStudents(studentsData.students)
-                        setClassroomInfo(studentsData.classroom)
-                        setFormData({})
-                        setErrors({ success: "Student Name Updated" })
-                        setCurrentlyEditingStudent({first_name: formData['first_name'], last_name: formData['last_name'], student_id: formData['student_id'], student_email: formData['student_email']})
-                    })
-                    .catch((err) => {
-                        alert("Failed to fetch students after update.");
-                    })
+                expressServices.retrieveStudents({ classroomId: classroomId })
+                .then((studentsData) => {
+                    setStudents(studentsData.students)
+                    setClassroomInfo(studentsData.classroom)
+                    setFormData({})
+                    setErrors({ success: "Student Name Updated" })
+                    setCurrentlyEditingStudent({first_name: formData['first_name'], last_name: formData['last_name'], student_id: formData['student_id'], student_email: formData['student_email']})
+                })
+                .catch((err) => {
+                    alert("Failed to fetch students after update.");
+                })
             }
         })
         .catch((error) => {
@@ -246,27 +217,21 @@ const Classroom = () => {
 
     const deleteStudent = (student_id) => {
         setFormData({})
-        formData['csrf'] = csrf
         formData['student_id']= student_id
         formData['classroom_id'] = classroomId
         expressServices.deleteStudent(formData)
             .then((result) => {
                 if (result === true) {
-                    fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                        .then((res) => res.json())
-                        .then((response) => {
-                            setCSRF(response.csrf)
-                            return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
-                        })
-                        .then((studentsData) => {
-                            setStudents(studentsData.students)
-                            setClassroomInfo(studentsData.classroom)
-                            setFormData({})
-                            alert("Student Removed")
-                        })
-                        .catch((err) => {
-                            alert("Failed to fetch students after deletion.");
-                        })
+                    expressServices.retrieveStudents({ classroomId: classroomId })
+                    .then((studentsData) => {
+                        setStudents(studentsData.students)
+                        setClassroomInfo(studentsData.classroom)
+                        setFormData({})
+                        alert("Student Removed")
+                    })
+                    .catch((err) => {
+                        alert("Failed to fetch students after deletion.");
+                    })
                 } else {
                     alert('Failed to delete.')
                 }

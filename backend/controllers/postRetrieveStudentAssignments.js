@@ -2,7 +2,6 @@ const { FindDocuments, FindDocument, InsertDocument } = require("../core/Databas
 
 const postRetrieveStudentAssignments = async (req, res) => {
     if(req.headers.origin === process.env.FRONTEND_URL){
-        if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             try {
                 const this_student = await FindDocuments('users', { student_id: req.body.student_id }, { 'classroom_id': 1 })
                 let all_assignments = []
@@ -30,14 +29,11 @@ const postRetrieveStudentAssignments = async (req, res) => {
                     }
                     // all_assignments.push(...assignments)
                 }
-
-                // console.log(all_assignments)
             
                 res.json({ status: true, assignments: all_assignments })
             } catch (error) {
                 res.status(500).json({ status: false, error: 'An error occurred while fetching assignments.' })
-            }            
-        }
+            }
     }
 }
 
