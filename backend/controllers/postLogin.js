@@ -13,10 +13,8 @@ const postLogin = async (req, res) => {
                     userFirstName: login.first_name,
                     isAdmin: login.admin
                 };
-                console.log(payload)
 
                 const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '2h' });
-                console.log(token)
 
                 if (login.user_id > 0) {
                     await UpdateDocument('users', { email: req.body.email }, { last_login: new Date() });
