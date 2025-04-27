@@ -1,7 +1,7 @@
 const { DeleteDocument, FindDocuments } = require("../core/DatabaseFunctions")
 
 const postDeleteClassroom = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
+    if(req.headers.origin === process.env.FRONTEND_URL){
         if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             try {
                 const classroom_assignments = await FindDocuments('assignments', {class_id: req.body.classroomId})

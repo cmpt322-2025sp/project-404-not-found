@@ -1,7 +1,7 @@
 const { UpdateDocuments, FindDocument } = require("../core/DatabaseFunctions")
 
 const postChangeStudentData = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
+    if(req.headers.origin === process.env.FRONTEND_URL){
         if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             try {
                 const student = await FindDocument('users', {student_id: req.body.student_id})

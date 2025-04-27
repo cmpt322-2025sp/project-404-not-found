@@ -1,7 +1,7 @@
 const { UpdateDocument, FindDocument } = require("../core/DatabaseFunctions")
 
 const postChangeAssignmentDue = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
+    if(req.headers.origin === process.env.FRONTEND_URL){
         if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             try {
                 await UpdateDocument('assignments', {_id: req.body.assignment_id}, {due_date: req.body.assignmentDue})

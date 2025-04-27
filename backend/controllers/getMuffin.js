@@ -1,7 +1,7 @@
 const MuffinFunctions = require("../core/MuffinFunctions");
 
 const getMuffin = (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
+    if(req.headers.origin === process.env.FRONTEND_URL){
         res.json({value: MuffinFunctions.accessMuffin(req.session, req.params.crumble)});
     }else{
         res.status(403).json({ error: 'Invaid Entry' });

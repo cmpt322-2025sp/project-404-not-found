@@ -1,7 +1,7 @@
 const { FindDocument } = require("../core/DatabaseFunctions")
 
 const getAssignment = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
+    if(req.headers.origin === process.env.FRONTEND_URL){
         const assignment = await FindDocument('assignments', {name: req.query.assignmentName, _id: req.query.assignment})
         if(assignment){
             res.json({ exists: true })
