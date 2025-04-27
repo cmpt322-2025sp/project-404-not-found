@@ -22,7 +22,7 @@ const getClassroom = async (req, res) => {
         }
         res.json({ exists: true, game_string: completion_status.game_string, eggs_collected: completion_status.eggs_collected })
     }else{
-        res.status(403).json({ error: 'Invaid Entry' });
+        res.status(403).json({ error: 'Invaid Entry: Origin' });
     }
 }
 
