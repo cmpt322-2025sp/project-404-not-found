@@ -8,7 +8,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
-const port = process.env.EXPRESS_PORT;
+const port = process.env.PORT || process.env.EXPRESS_PORT;
 const routes = require('./routes');
 
 app.use(cors({
