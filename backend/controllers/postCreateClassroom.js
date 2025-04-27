@@ -1,7 +1,7 @@
 const UserFunctions = require("../core/UserFunctions")
 
 const postCreateClassroom = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
+    if(req.headers.origin === process.env.FRONTEND_URL){
         if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             creation = await UserFunctions.createClassroom(req.body.classroomName)
             if(creation.status === true){

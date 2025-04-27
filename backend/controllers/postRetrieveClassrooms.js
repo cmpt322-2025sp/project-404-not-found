@@ -1,7 +1,7 @@
 const { FindDocuments } = require("../core/DatabaseFunctions")
 
 const postRetrieveClassrooms = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
+    if(req.headers.origin === process.env.FRONTEND_URL){
         if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             try {
                 const classrooms = await FindDocuments('classrooms', {}, {'name':1, 'students_count': 1}, {name: 1})

@@ -1,7 +1,7 @@
 const { FindDocuments } = require("../core/DatabaseFunctions")
 
 const postRetrieveAssignments = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
+    if(req.headers.origin === process.env.FRONTEND_URL){
         if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             try {
                 const assignments = await FindDocuments('assignments', { present_in_view: true }, { 'name': 1, 'due_date': 1, 'class_id': 1 }, {due_date: -1});

@@ -2,7 +2,7 @@ const UserFunctions = require("../core/UserFunctions")
 const { UpdateDocument } = require("../core/DatabaseFunctions")
 
 const postLogin = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
+    if(req.headers.origin === process.env.FRONTEND_URL){
         if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             const login = await UserFunctions.loginUser(req.body.email, req.body.h_password);
             if(login.authenticated){

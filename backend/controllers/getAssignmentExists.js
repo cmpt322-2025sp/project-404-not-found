@@ -1,7 +1,7 @@
 const { FindDocument } = require("../core/DatabaseFunctions")
 
 const getClassroom = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
+    if(req.headers.origin === process.env.FRONTEND_URL){
         const user_in_classroom = await FindDocument('users', {student_id: req.query.user_id, classroom_id: req.query.classroom})
         if(!user_in_classroom){
             res.json({ exists: false })
