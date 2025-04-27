@@ -6,7 +6,7 @@ const getCSRF = (req, res) => {
         req.session.csrf = csrf;
         res.json({ csrf: csrf });
     }else{
-        res.status(403).json({ error: 'Invaid Entry' });
+        res.status(403).json({ error: 'Invaid Entry: Origin' });
     }
 };
 

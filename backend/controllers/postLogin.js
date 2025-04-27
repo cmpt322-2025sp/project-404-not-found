@@ -18,10 +18,10 @@ const postLogin = async (req, res) => {
                 res.json({ loggedIn: false, error: login.error });
             }
         }else{
-            res.status(403).json({ error: 'Invaid Entry' });
+            res.status(403).json({ error: 'Invaid Entry: CSRF' });
         }
     }else{
-        res.status(403).json({ error: 'Invaid Entry' });
+        res.status(403).json({ error: 'Invaid Entry: Origin' });
     }
 };
 

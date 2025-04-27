@@ -9,7 +9,7 @@ const getStudent = async (req, res) => {
             res.json({ exists: false })
         }
     }else{
-        res.status(403).json({ error: 'Invaid Entry' });
+        res.status(403).json({ error: 'Invaid Entry: Origin' });
     }
 }
 
