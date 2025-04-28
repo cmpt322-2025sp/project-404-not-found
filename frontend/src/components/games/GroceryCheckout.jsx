@@ -188,6 +188,7 @@ export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
               )
             `,
             zIndex: 1,
+            left: "8%",
           }}
         >
           <h2

@@ -147,7 +147,7 @@ const styles = {
     fontSize: '1.6em',
     color: '#fff',
     fontWeight: 'bold',
-    backgroundColor: '#ffcc00',
+    backgroundColor: '#ff1a1a',
     padding: '8px',
     borderRadius: '10px',
     display: 'inline-block',

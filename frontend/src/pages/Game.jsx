@@ -9,7 +9,83 @@ import ProgressBar from "../components/ProgressBar"
 import { character_speed, character_dimension, character_initial_position, island_positions } from "../Const"
 import { useExpressServices } from "../functions/ExpressServicesProvider"
 import GameButtons from "../components/GameButtons";
+import { allTracks, mainMusic } from "../utils/bgMusic";
+import { muteState } from "../utils/muteEngine";
+
 const Game = () => {
+    const [muted, setMuted] = useState(false);
+    
+        const applyMute = (flag) => {
+            muteState.muted = flag;
+    
+            allTracks.forEach((trk) => {
+                if (flag) {
+                    trk.__wasPlaying = !trk.paused;
+                    trk.muted = true;
+                    trk.pause();
+                } else {
+                    trk.muted = false;
+                    if (trk.__wasPlaying) trk.play().catch(() => { });
+                }
+            });
+    
+            document.querySelectorAll("audio").forEach((a) => {
+                if (flag) {
+                    a.__wasPlaying = !a.paused;
+                    a.muted = true;
+                    a.pause();
+                } else {
+                    a.muted = false;
+                    if (a.__wasPlaying) a.play().catch(() => { });
+                }
+            });
+        };
+    
+        const toggleMute = () =>
+            setMuted((prev) => {
+                const next = !prev;
+                applyMute(next);
+                return next;
+            });
+    
+        /* keep future <audio> tags aligned with the flag */
+        useEffect(() => {
+            const obs = new MutationObserver((muts) =>
+                muts.forEach((m) =>
+                    m.addedNodes.forEach((n) => {
+                        if (!n.querySelectorAll) return;
+                        const audios = [
+                            ...(n.tagName === "AUDIO" ? [n] : []),
+                            ...n.querySelectorAll("audio"),
+                        ];
+                        audios.forEach((a) => {
+                            a.muted = muted;
+                            if (muted) a.pause();
+                        });
+                    })
+                )
+            );
+            obs.observe(document.body, { childList: true, subtree: true });
+            return () => obs.disconnect();
+        }, [muted]);
+    
+        /* start / stop the overworld loop */
+        useEffect(() => {
+            if (mainMusic.paused) mainMusic.play().catch(() => { });
+            applyMute(muted);   // honour current state
+    
+            return () => {
+                allTracks.forEach((t) => {
+                    t.pause();
+                    t.currentTime = 0;
+                });
+                document.querySelectorAll("audio").forEach((a) => {
+                    a.pause();
+                    a.currentTime = 0;
+                });
+            };
+        }, []);
+
     const navigate = useNavigate()
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
@@ -206,6 +282,28 @@ const Game = () => {
                     <div style={{ marginTop: "1rem" }}>🥚🥚🥚</div>
                 </div>
             )}
+            
+            {/* mute toggle */}
+            <button
+                onClick={toggleMute}
+                style={{
+                    position: "absolute",
+                    top: "88%",
+                    right: "93.5%",
+                    zIndex: 1,
+                    backgroundColor: "#4da6ff",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "50%",
+                    height: "8%",
+                    width: "5%",
+                    fontSize: "200%",
+                    cursor: "pointer",
+                }}
+                title={muted ? "Un-mute" : "Mute"}
+            >
+                {muted ? "🔇" : "🔊"}
+            </button>
 
         </Playground>
         
