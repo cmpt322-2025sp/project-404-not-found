@@ -1,8 +1,19 @@
 import React from "react"
 import Logout from "./Logout"
 
-const ProgressBar = ({ scores, eggs_collected }) => {
+const ProgressBar = ({ scores, eggs_collected, preview=false }) => {
     const eggsRemaining = 3 - eggs_collected
+
+    if (preview) {
+
+        return (
+            <div style={containerStyle}>
+                <h4 style={titleStyle}>🌟 Preview Mode 🌟</h4>
+                <Logout/>
+            </div>
+        )
+
+    } else {
 
     return (
         <div style={containerStyle}>
@@ -33,6 +44,8 @@ const ProgressBar = ({ scores, eggs_collected }) => {
             <Logout/>
         </div>
     )
+
+    }
 }
 
 const containerStyle = {

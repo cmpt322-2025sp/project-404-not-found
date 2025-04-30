@@ -26,8 +26,8 @@ const Router = () => {
                             </Route>
                             <Route element={<ProtectedAdminRoutes />}>
                                 <Route path="/admin/*" element={<Admin />} />
-                                <Route path="/preview" element={<Preview />} />
                             </Route>
+                            <Route path="/preview" element={<Preview />} />
                             <Route path="*" element={ <Page404/> }/>
                         </Route>
                     </Routes>

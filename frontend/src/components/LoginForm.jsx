@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "../functions/AuthProvider"
+import { useNavigate } from "react-router-dom"
 
 const LoginForm = () => {
     const [formData, setFormData] = useState({});
     const [errors, setErrors] = useState({});
     const auth = useAuth();
+    const navigate = useNavigate()
 
     const handleChange = (event) => {
         const name = event.target.name;
@@ -140,7 +142,7 @@ const LoginForm = () => {
                     />
                 </div>
 
-                <div>
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'space-between'}}>
                     <input
                         type="submit"
                         value="🎉 Start Playing!"
@@ -156,11 +158,31 @@ const LoginForm = () => {
                             transition: 'transform 0.2s ease',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
                             display: 'block',
-                            margin: 'auto'
+                            margin: 'auto',
+                            marginRight: '2px'
                         }}
                         onMouseOver={(e) => e.target.style.transform = 'scale(1.1)'}
                         onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
                     />
+                    <button
+                        style={{
+                            width: '85%',
+                            padding: '12px',
+                            border: 'none',
+                            backgroundColor: '#11bb00',
+                            color: '#fff',
+                            borderRadius: '12px',
+                            fontSize: '18px',
+                            cursor: 'pointer',
+                            transition: 'transform 0.2s ease',
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                            display: 'block',
+                            margin: 'auto'
+                        }}
+                        onMouseOver={(e) => e.target.style.transform = 'scale(1.1)'}
+                        onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+                        onClick={ () => {navigate('preview')}}
+                    >🎮 Preview</button>
                 </div>
             </form>
 
