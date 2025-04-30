@@ -1,11 +1,20 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
 export default function Question({ x, y, color, emoji, onAnswerCheck }) {
-  function handleClick() {
-    const input = document.getElementById("answer");
-    onAnswerCheck(input.value);
-    input.value = "";
-  }
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const submit = () => {
+    const val = inputRef.current?.value ?? "";
+    onAnswerCheck(val);
+    if (inputRef.current) {
+      inputRef.current.value = "";  // clear
+      inputRef.current.focus();     // and re-focus
+    }
+  };
 
   return (
     <div
@@ -23,26 +32,24 @@ export default function Question({ x, y, color, emoji, onAnswerCheck }) {
       <h1>
         {emoji} {x} + {y}
       </h1>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
+
+      <div style={{ display: "flex", flexDirection: "row" }}>
         <input
-          id="answer"
-          type="text"
+          ref={inputRef}
+          type="number"
           placeholder="answer"
+          autoFocus          /* <- initial focus */
+          onKeyDown={(e) => e.key === "Enter" && submit()}
           style={{
             color: "purple",
             backgroundColor: "lightgrey",
+            width: 150,
+            textAlign: "center",
           }}
         />
         <button
-          style={{
-            backgroundColor: "lightgreen",
-          }}
-          onClick={handleClick}
+          onClick={submit}
+          style={{ backgroundColor: "lightgreen", marginLeft: 6 }}
         >
           SUBMIT
         </button>

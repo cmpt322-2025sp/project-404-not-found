@@ -2,50 +2,53 @@ import React, { useRef, useState, useEffect } from "react";
 import GroceryCheckoutbg from "../../asset/images/GroceryCheckout.png";
 import successSoundFile from "../../asset/sounds/success.mp3";
 import failSoundFile from "../../asset/sounds/fail.wav";
-import { mainMusic, groceryMusic } from "../../utils/bgMusic";
 import startSound from "../../asset/sounds/gameStart.mp3";
+import { mainMusic, groceryMusic } from "../../utils/bgMusic";
 
-const groceryNames = ["🍊 Oranges", "🍎 Apples", "🍌 Bananas", "🥛 Milk", "🥖 Bread", "🥚 Eggs"];
 
-function getGroceriesWithRandomPrices() {
-  return groceryNames.map((name) => ({
-    name,
+const groceryNames = [
+  "🍊 Oranges",
+  "🍎 Apples",
+  "🍌 Bananas",
+  "🥛 Milk",
+  "🥖 Bread",
+  "🥚 Eggs",
+];
+
+function randomList() {
+  return groceryNames.map((n) => ({
+    name: n,
     price: Math.floor(Math.random() * 10) + 1,
   }));
 }
 
-
 function ConfettiEffect() {
-  const confettiPieces = Array.from({ length: 50 }, (_, i) => i);
-
+  const pieces = Array.from({ length: 50 }, (_, i) => i);
   return (
     <div
       style={{
         position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
+        inset: 0,
         pointerEvents: "none",
         overflow: "hidden",
         zIndex: 9999,
       }}
     >
-      {confettiPieces.map((piece) => {
-        const left = Math.random() * 100;
-        const delay = Math.random() * 1;
-        const bgColor = `hsl(${Math.random() * 360}, 80%, 60%)`;
+      {pieces.map((id) => {
+        const delay = Math.random();
+        const left  = Math.random() * 100;
+        const bg    = `hsl(${Math.random() * 360},80%,60%)`;
         return (
           <div
-            key={piece}
+            key={id}
             style={{
               position: "absolute",
               left: `${left}%`,
               top: "100%",
-              width: "12px",
-              height: "12px",
-              backgroundColor: bgColor,
+              width: 12,
+              height: 12,
               borderRadius: "50%",
+              backgroundColor: bg,
               animation: `confetti-fall 1.5s ease-out ${delay}s forwards`,
             }}
           />
@@ -55,252 +58,193 @@ function ConfettiEffect() {
   );
 }
 
+/* ────────────────────────────────────────────────────────────────── */
+/*  MAIN COMPONENT                                                    */
+/* ────────────────────────────────────────────────────────────────── */
 export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
-
+  /* background-music hand-off */
   useEffect(() => {
-    // They arrived here from GrocerySelection, so grocery loop is still going.
-    // Make sure it’s playing (some mobile browsers suspend it on navigation).
-    groceryMusic.play();
-
-    // When this component un‑mounts (they press Continue)…
+    groceryMusic.play().catch(() => {});
     return () => {
-      groceryMusic.pause();   // stop supermarket ambience
-      mainMusic.play();       // bring back the main theme
+      groceryMusic.pause();
+      mainMusic.play().catch(() => {});
     };
   }, []);
 
-  const [groceries] = useState(() => getGroceriesWithRandomPrices());
-
+  const [groceries] = useState(randomList);
   const [score, setScore] = useState(previousScore);
-
   const [isGameOver, setIsGameOver] = useState(false);
-
-  const totalRef = useRef(null);
   const [feedback, setFeedback] = useState("");
-
-  const actualTotal = groceries.reduce((sum, item) => sum + item.price, 0);
-
-  const successAudioRef = useRef(null);
-  const failAudioRef = useRef(null);
-  const startSoundRef = useRef(null);
-
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const handleCheckout = () => {
-    const userTotal = parseInt(totalRef.current.value, 10) || 0;
+  const totalRef        = useRef(null);
+  const successAudioRef = useRef(null);
+  const failAudioRef    = useRef(null);
+  const startSoundRef   = useRef(null);
+
+  /* auto-focus once on mount */
+  useEffect(() => totalRef.current?.focus(), []);
+
+  /* tidy confetti */
+  useEffect(() => {
+    if (!showConfetti) return;
+    const t = setTimeout(() => setShowConfetti(false), 2000);
+    return () => clearTimeout(t);
+  }, [showConfetti]);
+
+  const actualTotal = groceries.reduce((s, g) => s + g.price, 0);
+
+  /* --------------------------------------------------------------- */
+  /*   CHECK-OUT HANDLER                                             */
+  /* --------------------------------------------------------------- */
+  const checkAnswer = () => {
+    const userTotal = parseInt(totalRef.current.value || "0", 10);
 
     if (userTotal === actualTotal) {
-      setFeedback(`Hooray! You got it right! The total is $${actualTotal} and you got a score of ${score}.`);
-      if (successAudioRef.current) {
-        successAudioRef.current.currentTime = 0;
-        successAudioRef.current.play();
-      }
+      /* ✓ correct */
+      setFeedback(
+        `Hooray! You got it right! The total is $${actualTotal} and you scored ${score}.`
+      );
+      successAudioRef.current?.play().catch(() => {});
       setShowConfetti(true);
       setIsGameOver(true);
     } else {
-      setFeedback(`Oops! You entered $${userTotal}, which is wrong. Try again!`);
-      if (failAudioRef.current) {
-        failAudioRef.current.currentTime = 0;
-        failAudioRef.current.play();
-      }
-      setShowConfetti(false);
-
+      /* ✗ wrong */
+      setFeedback(`Oops! You entered $${userTotal}. Try again!`);
+      failAudioRef.current?.play().catch(() => {});
       setScore((prev) => Math.max(0, prev - 100));
-    }
-    if (score === 0) {
-      setIsGameOver(true);
-      setFeedback(`Oops! You entered $${userTotal}, which is wrong. You got a total score of ${score}.`);
+      if (score - 100 <= 0) setIsGameOver(true);
+
+      /* 🔄 clear + refocus for next attempt */
+      setTimeout(() => {
+        if (totalRef.current) {
+          totalRef.current.value = "";       // clear box
+          totalRef.current.focus();          // re-focus it
+        }
+      }, 0);
     }
   };
 
   const submitScore = () => {
-    onScoreSubmission(Math.round((score / 2000) * 100))
-  }
+    onScoreSubmission(Math.round((score / 2000) * 100));
+  };
 
-  useEffect(() => {
-    if (showConfetti) {
-      const timer = setTimeout(() => {
-        setShowConfetti(false);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [showConfetti]);
-
+  /* --------------------------------------------------------------- */
+  /* RENDER                                                          */
+  /* --------------------------------------------------------------- */
   return (
     <>
       <style>
         {`
           @keyframes confetti-fall {
-            0% {
-              transform: translateY(0);
-              opacity: 1;
-            }
-            100% {
-              transform: translateY(-120vh) rotate(360deg);
-              opacity: 0;
-            }
+            0%   {transform:translateY(0); opacity:1;}
+            100% {transform:translateY(-120vh) rotate(360deg); opacity:0;}
           }
         `}
       </style>
 
-      {/* Audio Elements */}
       <audio ref={successAudioRef} src={successSoundFile} />
-      <audio ref={failAudioRef} src={failSoundFile} />
+      <audio ref={failAudioRef}    src={failSoundFile}     />
 
       <div
         style={{
-          fontFamily: "'Comic Sans MS', cursive, sans-serif",
-          width: "100%",
-          height: "100%",
-          backgroundImage: `url(${GroceryCheckoutbg})`,
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-          display: "flex",
-          justifyContent: "flex-start",
-          alignItems: "center",
           position: "absolute",
-          top: 0,
-          left: 0,
+          inset: 0,
+          fontFamily: "'Comic Sans MS', cursive",
+          background: `url(${GroceryCheckoutbg}) center/cover no-repeat`,
+          display: "flex",
+          alignItems: "center",
           padding: "5%",
           boxSizing: "border-box",
-          overflow: "hidden",
         }}
       >
-        {/* Confetti */}
         {showConfetti && <ConfettiEffect />}
 
+        {/* receipt / panel */}
         <div
           style={{
             position: "relative",
-            width: "360px",
-            // minHeight: "620px",
+            width: 360,
             padding: "1.5rem",
-            borderRadius: "16px",
+            borderRadius: 16,
             boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-            background: `
-              repeating-linear-gradient(
-                0deg,
-                #fff 0px,
-                #fff 26px,
-                #ffe7e7 26px,
-                #ffe7e7 28px
-              )
-            `,
+            background:
+              "repeating-linear-gradient(0deg,#fff 0px,#fff 26px,#ffe7e7 26px,#ffe7e7 28px)",
             zIndex: 1,
             left: "8%",
           }}
         >
-          <h2
-            style={{
-              textAlign: "center",
-              marginBottom: "1.5rem",
-              fontSize: "1.8rem",
-              color: "#FF5722",
-            }}
-          >
-            Grocery Fun!
+          <h2 style={{ textAlign: "center", marginBottom: "1.5rem", color: "#FF5722" }}>
+            Grocery&nbsp;Fun!
           </h2>
 
-          <p style={{ fontSize: "1rem", color: "#333", marginBottom: "1rem" }}>
-            Score: <strong style={{ color: "#FF5722" }}>{score}</strong>
+          <p>
+            Score:&nbsp;
+            <strong style={{ color: "#FF5722" }}>{score}</strong>
           </p>
 
-          <p style={{ margin: "0 0 1rem 0", fontSize: "1.0rem", color: "#333" }}>
-            Here is Bob's groceries! Can you add them up?
+          <p style={{ margin: "1rem 0" }}>
+            Here are Bob&nbsp;'s groceries – can you add them up?
           </p>
 
-          <ul style={{ listStyleType: "none", padding: 0, margin: 0, fontSize: "1.2rem" }}>
-            {groceries.map((item, index) => (
-              <li key={index} style={{ marginBottom: "0.5rem", color: "#555" }}>
-                <strong>{item.name}</strong> – ${item.price}
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {groceries.map((g, i) => (
+              <li key={i} style={{ fontSize: "120%", marginBottom: "0.5rem", color: "#555" }}>
+                <strong>{g.name}</strong> – ${g.price}
               </li>
             ))}
           </ul>
 
-          {/* Hide the input + button */}
+          {/* ---- INPUT & CHECKOUT BUTTON ---- */}
           {!isGameOver && (
             <>
               <div style={{ marginTop: "1rem" }}>
-                <label style={{ fontSize: "1.1rem", color: "#555" }}>
-                  <strong>Total: </strong>
+                <label>
+                  <strong>Total:&nbsp;</strong>
                   <input
-                    type="number"
                     ref={totalRef}
-                    defaultValue=""
+                    type="number"
+                    autoFocus          /* focus on first render        */
+                    onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
                     style={{
                       marginLeft: "0.5rem",
-                      width: "100px",
+                      width: 100,
                       fontSize: "1rem",
                       padding: "0.3rem",
                       border: "2px solid #FF5722",
-                      borderRadius: "8px",
+                      borderRadius: 8,
                       outline: "none",
                     }}
                   />
                 </label>
               </div>
 
-              <button
-                onClick={handleCheckout}
-                style={{
-                  marginTop: "1.2rem",
-                  padding: "0.6rem 1.2rem",
-                  cursor: "pointer",
-                  backgroundColor: "#FF5722",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "12px",
-                  fontSize: "1rem",
-                  boxShadow: "0 3px 5px rgba(0,0,0,0.3)",
-                  transition: "transform 0.1s",
-                }}
-                onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
-                onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
-              >
-                Check Out
+              <button onClick={checkAnswer} style={btn("#FF5722")}>
+                Check&nbsp;Out
               </button>
             </>
           )}
 
-          {/* If the game is over, show a "Continue" button */}
+          {/* ---- CONTINUE BUTTON ---- */}
           {isGameOver && (
             <button
-              style={{
-                marginTop: "1.2rem",
-                padding: "0.6rem 1.2rem",
-                cursor: "pointer",
-                backgroundColor: "#4CAF50",
-                color: "#fff",
-                border: "none",
-                borderRadius: "12px",
-                fontSize: "1rem",
-                boxShadow: "0 3px 5px rgba(0,0,0,0.3)",
-                transition: "transform 0.1s",
-              }}
-              onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
-              onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
               onClick={() => {
-                if (startSoundRef.current) {
-                  startSoundRef.current.currentTime = 0;
-                  startSoundRef.current.play().catch(() => { });
-                }
-                setTimeout(() => {
-                  submitScore();
-                }, 800); // slight delay to let sound play
+                startSoundRef.current?.play().catch(() => {});
+                setTimeout(submitScore, 800);
               }}
-
+              style={btn("#4CAF50")}
             >
               Continue
             </button>
           )}
 
+          {/* feedback */}
           {feedback && (
             <div
               style={{
                 marginTop: "1.2rem",
                 fontSize: "1rem",
-                color: feedback.includes("Hooray") ? "green" : "red",
+                color: feedback.startsWith("Hooray") ? "green" : "red",
               }}
             >
               {feedback}
@@ -308,7 +252,22 @@ export default function GroceryCheckout({ previousScore, onScoreSubmission }) {
           )}
         </div>
       </div>
+
       <audio ref={startSoundRef} src={startSound} />
     </>
   );
 }
+
+/* helper for buttons */
+const btn = (bg) => ({
+  marginTop: "1.2rem",
+  padding: "0.6rem 1.2rem",
+  cursor: "pointer",
+  backgroundColor: bg,
+  color: "#fff",
+  border: "none",
+  borderRadius: 12,
+  fontSize: "1rem",
+  boxShadow: "0 3px 5px rgba(0,0,0,0.3)",
+  transition: "transform 0.1s",
+});
