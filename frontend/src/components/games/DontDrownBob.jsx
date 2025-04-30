@@ -1,27 +1,15 @@
 import { useEffect, useState, useRef } from "react";
-import background from "../../asset/images/DontDrownBobBackground.png"
+import background from "../../asset/images/DontDrownBobBackground.png";
 import bridge from "../../asset/images/bridge.png";
 import logo from "../../asset/images/ddblogo.png";
 import bob from "../../asset/images/bob2.png";
 import Balloon from "./Balloon";
 import Bob from "./Bob";
-import { mainMusic, BobDrownsMusic } from "../../utils/bgMusic"
-
+import { mainMusic, BobDrownsMusic } from "../../utils/bgMusic";
 
 const DontDrownBob = ({ onScoreSubmission }) => {
+    const answerRef = useRef(null);
 
-    useEffect(() => {
-        mainMusic.pause();            // pause big‑world loop
-        BobDrownsMusic.currentTime = 0; // rewind
-        BobDrownsMusic.play();          // start grocery loop
-
-        // Cleanup: if user exits by closing popup early
-        return () => {
-            BobDrownsMusic.pause();
-            mainMusic.play();
-        }
-    }, []);
-    //balloon data ////////////////////////////////////////////////////////////////////
     const [death, setDeath] = useState(false);
     const [start, setStart] = useState(true);
     const xaxis = ["20", "28", "36", "44", "52", "60", "68", "76"];
@@ -34,8 +22,8 @@ const DontDrownBob = ({ onScoreSubmission }) => {
         Math.floor(Math.random() * 11),
         Math.floor(Math.random() * 11),
         Math.floor(Math.random() * 11),
-    ] );
-    const [originalYs] = useState( [
+    ]);
+    const [originalYs] = useState([
         Math.floor(Math.random() * originalXs[0]),
         Math.floor(Math.random() * originalXs[1]),
         Math.floor(Math.random() * originalXs[2]),
@@ -44,139 +32,170 @@ const DontDrownBob = ({ onScoreSubmission }) => {
         Math.floor(Math.random() * originalXs[5]),
         Math.floor(Math.random() * originalXs[6]),
         Math.floor(Math.random() * originalXs[7]),
-    ] );
-    //const correctAnswer = originalX - originalY;
+    ]);
     const [bobOnBalloon, setBobOnBalloon] = useState(1);
     const [score, setScore] = useState(0);
-    /////////////////////////////////////////////////////////////////////////////////   
-
     const [gameOver, setGameOver] = useState(false);
 
-    const handleGameOver = () => {
-        setGameOver(true); // Trigger game-over state
-    };
+    useEffect(() => {
+        mainMusic.pause();
+        BobDrownsMusic.currentTime = 0;
+        BobDrownsMusic.play();
+        return () => {
+            BobDrownsMusic.pause();
+            mainMusic.play();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!start && !death && !gameOver && answerRef.current) {
+            answerRef.current.focus();
+        }
+    }, [start, death, gameOver, bobOnBalloon]);
+
+    const handleGameOver = () => setGameOver(true);
 
     const handleClick = () => {
-        const inputValue = parseInt(document.getElementById("answer").value);
+        if (!answerRef.current) return;
+        const attempt = Number(answerRef.current.value.trim());
+        const correct =
+            originalXs[bobOnBalloon - 1] - originalYs[bobOnBalloon - 1];
 
-        console.log("values: " + originalXs[bobOnBalloon] + ", " + originalYs[bobOnBalloon]);
-        const correctAnswer = originalXs[bobOnBalloon - 1] - originalYs[bobOnBalloon - 1];
-        console.log("handleclick: " + inputValue + ", " + correctAnswer);
-
-        if (correctAnswer === inputValue) {
-            console.log(":)");
-            document.getElementById("answer").value = " ";
-            setBobOnBalloon((prevBobOnBalloon) => {
-                const newBobOnBalloon = prevBobOnBalloon + 1;
-                if (newBobOnBalloon === 9) {
-                    setDeath(true);
-                }
-                return newBobOnBalloon;
+        if (attempt === correct) {
+            setBobOnBalloon((prev) => {
+                const next = prev + 1;
+                if (next === 9) setDeath(true);
+                return next;
             });
-            setScore((prevScore) => prevScore + 12.5);
+            setScore((s) => s + 12.5);
+
+            /* clear & refocus */
+            answerRef.current.value = "";
+            answerRef.current.focus();
         }
     };
 
-
-    // console.log( "bob on ballone is " + bobOnBalloon );
-
-    const submitScore = () => {
-        onScoreSubmission(Math.round(score))
-    }
+    const submitScore = () => onScoreSubmission(Math.round(score));
 
     return (
-
-        //BACKGROUND
-        <div style={{
-            backgroundImage: `url(${background})`,
-            position: "absolute",
-            top: 0,
-            left: 0,
-            padding: "5%",
-            boxSizing: "border-box",
-            overflow: "hidden",
-            height: "100%",
-            width: "100%",
-            display: "flex",
-            justifyContent: "space-evenly",
-            flexDirection: "column",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-
-        }}>
-
-            { !start && !death && !gameOver && (
-                 <Bob
-                 x = {Number(xaxis[bobOnBalloon - 1]) - 5}   // initial draw at balloon N
-                 y = "20"
-                 nextX={Number(xaxis[bobOnBalloon - 1]) -6}  // move 15% to the right
-                 nextY="20"
-               />
-                )}
-
-
-            <div style={{
-                backgroundImage: `url(${bridge})`,
+        <div
+            style={{
+                backgroundImage: `url(${background})`,
                 position: "absolute",
-                backgroundRepeat: "no-repeat",
-                bottom: "-85%",
-                left: "-15%",
-                height: "120%",
+                top: 0,
+                left: 0,
+                padding: "5%",
+                boxSizing: "border-box",
+                overflow: "hidden",
+                height: "100%",
                 width: "100%",
+                display: "flex",
+                justifyContent: "space-evenly",
+                flexDirection: "column",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+            }}
+        >
+            {/* Bob (alive) */}
+            {!start && !death && !gameOver && (
+                <Bob
+                    x={Number(xaxis[bobOnBalloon - 1]) - 5}
+                    y="20"
+                    nextX={Number(xaxis[bobOnBalloon - 1]) - 6}
+                    nextY="20"
+                />
+            )}
 
+            {/* Bridges */}
+            <div
+                style={{
+                    backgroundImage: `url(${bridge})`,
+                    position: "absolute",
+                    backgroundRepeat: "no-repeat",
+                    bottom: "-85%",
+                    left: "-15%",
+                    height: "120%",
+                    width: "100%",
+                }}
+            />
+            <div
+                style={{
+                    backgroundImage: `url(${bridge})`,
+                    position: "absolute",
+                    backgroundRepeat: "no-repeat",
+                    bottom: "-85%",
+                    left: "65%",
+                    height: "120%",
+                    width: "100%",
+                }}
+            />
 
-            }}></div>
+            {/* Balloons */}
+            {!start &&
+                !death &&
+                !gameOver &&
+                [...Array(8)].map((_, i) => (
+                    <Balloon
+                        key={i}
+                        id={`${i + 1}`}
+                        left={xaxis[i]}
+                        originalX={originalXs[i]}
+                        originalY={originalYs[i]}
+                        bobOnBalloon={bobOnBalloon}
+                        gameOver={handleGameOver}
+                    />
+                ))}
 
+            {/* Answer box */}
+            {!gameOver && !death && (
+                <input
+                    id="answer"
+                    ref={answerRef}
+                    autoFocus
+                    style={{
+                        position: "absolute",
+                        left: "43%",
+                        bottom: "20%",
+                        width: "19%",
+                        height: "10%",
+                        fontSize: "18px",
+                    }}
+                    onKeyDown={(e) => e.key === "Enter" && handleClick()}
+                />
+            )}
 
-            {!death && !gameOver && <Balloon id="1" left={xaxis[0]} originalX={originalXs[0]} originalY={originalYs[0]} bobOnBalloon={bobOnBalloon} gameOver={handleGameOver} />}
-            {!death && !gameOver && <Balloon id="2" left={xaxis[1]} originalX={originalXs[1]} originalY={originalYs[1]} bobOnBalloon={bobOnBalloon} gameOver={handleGameOver} />}
-            {!death && !gameOver && <Balloon id="3" left={xaxis[2]} originalX={originalXs[2]} originalY={originalYs[2]} bobOnBalloon={bobOnBalloon} gameOver={handleGameOver} />}
-            {!death && !gameOver && <Balloon id="4" left={xaxis[3]} originalX={originalXs[3]} originalY={originalYs[3]} bobOnBalloon={bobOnBalloon} gameOver={handleGameOver} />}
-            {!death && !gameOver && <Balloon id="5" left={xaxis[4]} originalX={originalXs[4]} originalY={originalYs[4]} bobOnBalloon={bobOnBalloon} gameOver={handleGameOver} />}
-            {!death && !gameOver && <Balloon id="6" left={xaxis[5]} originalX={originalXs[5]} originalY={originalYs[5]} bobOnBalloon={bobOnBalloon} gameOver={handleGameOver} />}
-            {!death && !gameOver && <Balloon id="7" left={xaxis[6]} originalX={originalXs[6]} originalY={originalYs[6]} bobOnBalloon={bobOnBalloon} gameOver={handleGameOver} />}
-            {!death && !gameOver && <Balloon id="8" left={xaxis[7]} originalX={originalXs[7]} originalY={originalYs[7]} bobOnBalloon={bobOnBalloon} gameOver={handleGameOver} />}
+            {/* Send button */}
+            {!gameOver && !death && (
+                <button
+                    style={{
+                        position: "absolute",
+                        left: "43%",
+                        bottom: "15%",
+                        width: "20%",
+                        height: "5%",
+                        fontSize: "13px",
+                        backgroundColor: "pink",
+                    }}
+                    onClick={handleClick}
+                >
+                    SEND
+                </button>
+            )}
 
-
-            <div style={{
-                backgroundImage: `url(${bridge})`,
-                position: "absolute",
-                backgroundRepeat: "no-repeat",
-                bottom: "-85%",
-                left: "65%",
-                height: "120%",
-                width: "100%",
-
-
-            }}></div>
-
-            {/* {!start && <Bob x="5" y="60" nextX={xaxis[0] - 5} nextY="20" />} */}
-
-            {!gameOver && !death && (<input id="answer" style={{
-                position: "absolute",
-                left: "43%",
-                bottom: "20%",
-                width: "19%",
-                height: "10%",
-                fontSize: "18px"
-
-
-            }}></input>)}
-
-            {!gameOver && !death && (<button style={{
-                position: "absolute",
-                left: "43%",
-                bottom: "15%",
-                width: "20%",
-                height: "5%",
-                fontSize: "13px",
-                backgroundColor: "pink"
-            }} onClick={() => { handleClick() }
-            }>SEND</button>)}
-
-            {/* DEATH SCREEN */}
+            {/* Death Screen */}
             {death && (
-                <div style={{ position: "absolute", top: "35%", left: "52%", transform: "translate(-40%, -30%)", backgroundColor: "rgba(0, 0, 0, 0.7)", padding: "20px", color: "white", fontSize: "30px" }}>
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "35%",
+                        left: "52%",
+                        transform: "translate(-40%, -30%)",
+                        backgroundColor: "rgba(0, 0, 0, 0.7)",
+                        padding: "20px",
+                        color: "white",
+                        fontSize: "30px",
+                    }}
+                >
                     <h1>Victorious!</h1>
                     <p>Your score: {score}</p>
                     <button
@@ -189,7 +208,7 @@ const DontDrownBob = ({ onScoreSubmission }) => {
                             border: "none",
                             borderRadius: "12px",
                             fontSize: "1rem",
-                            boxShadow: "0 3px 5px rgba(0,0,0,0.3)",
+                            boxShadow: "0 3px 5px rgba(0, 0, 0, 0.3)",
                             transition: "transform 0.1s",
                         }}
                         onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
@@ -198,139 +217,181 @@ const DontDrownBob = ({ onScoreSubmission }) => {
                     >
                         Continue
                     </button>
-
                 </div>
-
             )}
-            {gameOver && <div style={{
-                backgroundImage: `url(${logo})`,
-                position: "absolute",
-                backgroundRepeat: "no-repeat",
-                scale: "60%",
-                height: "50%",
-                width: "90%",
-                left: "22%",
-                top: "-5%"
 
-            }}></div>}
-
-            {/* Game Over Screen */}
+            {/* Game-Over overlay & logo */}
             {gameOver && (
-                <div style={{ position: "absolute", top: "35%", left: "52%", transform: "translate(-41%, -20%)", backgroundColor: "rgba(0, 0, 0, 0.7)", padding: "20px", color: "white", fontSize: "30px" }}>
-                    <h1>Game Over</h1>
-                    <p>Your score: {score}</p>
-                    <p style={{fontSize:"20px"}}>Correct Answer for {originalXs[bobOnBalloon]} - {originalYs[bobOnBalloon]} = {originalXs[bobOnBalloon] - originalYs[bobOnBalloon]}</p>
-                    <button
+                <>
+                    <div
                         style={{
-                            marginTop: "5%",
-                            padding: "4% 10%",
-                            cursor: "pointer",
-                            backgroundColor: "#4CAF50",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "12px",
-                            fontSize: "1rem",
-                            boxShadow: "0 3px 5px rgba(0,0,0,0.3)",
-                            transition: "transform 0.1s",
+                            backgroundImage: `url(${logo})`,
+                            position: "absolute",
+                            backgroundRepeat: "no-repeat",
+                            scale: "60%",
+                            height: "50%",
+                            width: "90%",
+                            left: "22%",
+                            top: "-5%",
                         }}
-                        onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
-                        onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
-                        onClick={submitScore}
+                    />
+                    <div
+                        style={{
+                            position: "absolute",
+                            top: "35%",
+                            left: "52%",
+                            transform: "translate(-41%, -20%)",
+                            backgroundColor: "rgba(0, 0, 0, 0.7)",
+                            padding: "20px",
+                            color: "white",
+                            fontSize: "30px",
+                        }}
                     >
-                        Continue
-                    </button>
-                </div>
-
+                        <h1>Game Over</h1>
+                        <p>Your score: {score}</p>
+                        <p style={{ fontSize: "20px" }}>
+                            Correct Answer for {originalXs[bobOnBalloon - 1]} -{" "}
+                            {originalYs[bobOnBalloon - 1]} ={" "}
+                            {originalXs[bobOnBalloon - 1] - originalYs[bobOnBalloon - 1]}
+                        </p>
+                        <button
+                            style={{
+                                marginTop: "5%",
+                                padding: "4% 10%",
+                                cursor: "pointer",
+                                backgroundColor: "#4CAF50",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "12px",
+                                fontSize: "1rem",
+                                boxShadow: "0 3px 5px rgba(0, 0, 0, 0.3)",
+                                transition: "transform 0.1s",
+                            }}
+                            onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
+                            onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
+                            onClick={submitScore}
+                        >
+                            Continue
+                        </button>
+                    </div>
+                </>
             )}
 
-            {death && <div style={{
-                backgroundImage: `url(${logo})`,
-                position: "absolute",
-                backgroundRepeat: "no-repeat",
-                scale: "60%",
-                height: "50%",
-                width: "90%",
-                left: "22%",
-                top: "-5%"
-
-            }}></div>}
-
-
-            {/* START SCREEN*/}.
+            {/* Start Screen */}
             {start && (
-                <div style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    padding: "5%",
-                    boxSizing: "border-box",
-                    overflow: "hidden",
-                    backgroundColor: "#A5B68D",
-                    height: "100%",
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "space-evenly",
-                    flexDirection: "column",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                }}>
-                    <div style={{
-                        backgroundImage: `url(${logo})`,
+                <div
+                    style={{
                         position: "absolute",
-                        backgroundRepeat: "no-repeat",
-                        height: "40%",
-                        width: "90%",
-                        left: "30%",
-                        top: "5%"
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "#A5B68D",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        overflow: "hidden",
+                    }}
+                >
+                    {/* Decorative Bobs */}
+                    <img
+                        src={bob}
+                        alt=""
+                        style={{
+                            position: "absolute",
+                            top: "10%",
+                            left: "5%",
+                            height: "180px",
+                            opacity: 0.6,
+                        }}
+                    />
+                    <img
+                        src={bob}
+                        alt=""
+                        style={{
+                            position: "absolute",
+                            top: "10%",
+                            right: "5%",
+                            height: "180px",
+                            opacity: 0.6,
+                            transform: "scaleX(-1)",
+                        }}
+                    />
 
-                    }}></div>
-                    <h1 style={{ position: "absolute", fontSize: "20px", width: "50%", left: "25%", top: "30%", padding: "20px", backgroundColor: "beige" }}>
-                        Make sure BOB doesn't drown! They need to get to the other platform before times up! They are jumping from balloon to ballon but they have to solve a math problem before jumping. Bob is on the hefty side so they need to be fast or they will drown😊</h1>
+                    {/* Center Panel */}
+                    <div
+                        style={{
+                            position: "relative",
+                            width: "90%",
+                            maxWidth: "700px",
+                            padding: "2rem",
+                            backgroundColor: "rgba(255,255,255,0.9)",
+                            borderRadius: "12px",
+                            boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+                            textAlign: "center",
+                        }}
+                    >
+                        {/* Logo */}
+                        <img
+                            src={logo}
+                            alt="Dont Drown Bob"
+                            style={{
+                                width: "60%",
+                                maxWidth: "300px",
+                                marginBottom: "1.5rem",
+                            }}
+                        />
 
-                    <p style={{
-                        position: "absolute",
-                        left: "44%",
-                        top: "45%",
-                        fontSize: "45px"
-                    }}>⬇️⬇️⬇️⬇️
-                    </p>
+                        {/* Instructions */}
+                        <p
+                            style={{
+                                fontFamily: "Arial, sans-serif",
+                                fontSize: "1.1rem",
+                                color: "#333",
+                                lineHeight: 1.4,
+                                marginBottom: "2rem",
+                            }}
+                        >
+                            Make sure BOB doesn’t drown! Jump from balloon to balloon by
+                            quickly solving math problems. Bob’s on the hefty side, so speed is
+                            key!
+                        </p>
 
-                    {/* left bob*/}.
+                        {/* Arrows */}
+                        <div
+                            style={{ marginTop: "1.5rem", fontSize: "2rem", color: "#4CAF50" }}
+                        >
+                            ⬇️⬇️⬇️
+                        </div>
 
-                    <div style={{
-                        position: "absolute",
-                        backgroundImage: `url(${bob})`,
-                        height: "440px",
-                        width: "340px",
-                        backgroundSize: "cover",
-                        backgroundPosition: "center bottom",
-                        top: "15%",
-                        left: "3%"
-                    }}></div>
-
-                    {/* right bob*/}.
-                    <div style={{
-                        position: "absolute",
-                        backgroundImage: `url(${bob})`,
-                        height: "440px",
-                        width: "340px",
-                        backgroundSize: "cover",
-                        backgroundPosition: "center bottom",
-                        top: "15%",
-                        left: "75%"
-                    }}></div>
-
-                    <button style={{
-                        position: "absolute", height: "20%", width: "40%", bottom: "20%", left: "30%", backgroundColor: "#F8ED8C", fontFamily: "papyrus", fontSize: "60px"
-                    }} onClick={() => setStart(false)}>START</button>
-                </div>)}
-
-
+                        {/* Start Button */}
+                        <button
+                            onClick={() => setStart(false)}
+                            style={{
+                                fontFamily: "Arial, sans-serif",
+                                fontSize: "1.25rem",
+                                padding: "0.75rem 2rem",
+                                backgroundColor: "#4CAF50",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                                transition: "background-color 0.2s ease",
+                            }}
+                            onMouseOver={(e) =>
+                                (e.currentTarget.style.backgroundColor = "#45A049")
+                            }
+                            onMouseOut={(e) =>
+                                (e.currentTarget.style.backgroundColor = "#4CAF50")
+                            }
+                        >
+                            START
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
+    );
+};
 
-
-
-    )
-}
-
-export default DontDrownBob
+export default DontDrownBob;
