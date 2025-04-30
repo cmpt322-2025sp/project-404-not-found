@@ -1,8 +1,7 @@
 const UserFunctions = require("../core/UserFunctions")
 
 const postAddStudent = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
-        if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
+    if(req.headers.origin === process.env.FRONTEND_URL){
             if (
                 !req.body.last_name || 
                 !req.body.first_name || 
@@ -26,7 +25,6 @@ const postAddStudent = async (req, res) => {
             } else {
                 return res.json({ status: false, error: 'Student Already Exists' })
             }
-        }
     }
 }
 

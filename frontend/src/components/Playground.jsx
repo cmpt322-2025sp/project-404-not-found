@@ -5,6 +5,7 @@ import yellow_island from "../asset/images/yellow_island.png";
 import tree          from "../asset/images/tree.png";
 import house         from "../asset/images/house.png";
 import store         from "../asset/images/store.png";
+import boat        from "../asset/images/boat4.png";
 import bg            from "../asset/images/playground.png";
 import { island_positions } from "../Const";
 import mainMusic from "../utils/bgMusic";          // singleton Audio object
@@ -94,7 +95,7 @@ const Playground = ({ assignment, children }) => {
           style={{
             position: "absolute",
             top: "54%",
-            left: "37%",
+            left: "23%",
             width: "9vw",
             height: "auto",
           }}
@@ -105,20 +106,20 @@ const Playground = ({ assignment, children }) => {
           alt="Store"
           style={{
             position: "absolute",
-            bottom: "74%",
-            right: "77%",
+            bottom: "78%",
+            right: "75%",
             width: "6vw",
             height: "auto",
           }}
         />
         <img
           id="tree"
-          src={tree}
+          src={boat}
           alt="Tree"
           style={{
             position: "absolute",
             top: "60%",
-            left: "75%",
+            left: "59%",
             width: "11vw",
             height: "auto",
           }}

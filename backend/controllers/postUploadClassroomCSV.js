@@ -1,10 +1,7 @@
 const UserFunctions = require("../core/UserFunctions")
 
 const postUploadClassroomCSV = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
-        if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
-
-
+    if(req.headers.origin === process.env.FRONTEND_URL){
             const csvData = req.body.csvData
             const processedData = csvData.map(row => {
                 return row.map(cell => cell.replace(/\r/g, '').trim())
@@ -47,7 +44,6 @@ const postUploadClassroomCSV = async (req, res) => {
 
             UserFunctions.updateStudentsCount(req.body.classroomId, numOfStudents)
             res.json({ status: true, students: numOfStudents })
-        }
     }
 }
 

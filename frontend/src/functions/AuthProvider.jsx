@@ -13,36 +13,25 @@ const AuthProvider = ({ children }) => {
     const navigateUser = useNavigate()
 
     useEffect(() => {
-        fetch(PROCESSURL + 'muffin/isAdmin', {method: 'GET', credentials: 'include'})
-            .then((res) => res.json())
-            .then((data) => {
-                setAdmin(data.value)
-            })
-        fetch(PROCESSURL + 'muffin/userId', {method: 'GET', credentials: 'include'})
-            .then((res) => res.json())
-            .then((data) => {
-                setUserId(data.value)
-            })
-        fetch(PROCESSURL + 'muffin/userFirstName', {method: 'GET', credentials: 'include'})
-            .then((res) => res.json())
-            .then((data) => {
-                setUserFirstName(data.value)
-            })
-        fetch(PROCESSURL + 'muffin/isLoggedIn', {method: 'GET', credentials: 'include'})
-            .then((res) => res.json())
-            .then((data) => {
-                setAuthentication(data.value)
-            })
+        const token = localStorage.getItem('token')
+        if(token){
+            fetch(PROCESSURL + 'muffin/all', {method: 'GET', credentials: 'include', headers: {'Authorization': `Bearer ${token}`}})
+                .then((res) => res.json())
+                .then((data) => {
+                    setUserId(data.value.userId)
+                    setAuthentication(data.value.isLoggedIn)
+                    setAdmin(data.value.isAdmin)
+                    setUserFirstName(data.value.userFirstName)
+                })
+        }
     }, [])
 
     const login = async (data) => {
         try {
             const res = await fetch(PROCESSURL + 'login', { 
                 method: "POST",
-                credentials: "include",
                 headers: {
-                    'Content-Type': 'application/json',
-                    csrf: data.csrf
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
             });
@@ -50,6 +39,7 @@ const AuthProvider = ({ children }) => {
             const response = await res.json();
     
             if (response.loggedIn) {
+                localStorage.setItem('token', response.token);
                 setAdmin(response.adminLoggedIn)
                 setAuthentication(true)
                 setUserId(response.userId)
@@ -66,15 +56,12 @@ const AuthProvider = ({ children }) => {
     
 
     const logout = () => {
-        fetch(PROCESSURL + 'logout', { 
-            method: "GET",
-            credentials: "include"
-        })
-            .then((res) => res.json())
-            .then(() => {
-                setAuthentication(false);
-                navigateUser('/');
-            })
+        localStorage.removeItem('token')
+        setAuthentication(false);
+        setAdmin(false);
+        setUserId(null);
+        setUserFirstName(null);
+        navigateUser('/');
     }
 
     return <AuthContext.Provider value={{ isAuthenticated, isAdmin, userId, userFirstName, login, logout }}>{children}</AuthContext.Provider>

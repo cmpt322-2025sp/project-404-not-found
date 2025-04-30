@@ -17,7 +17,6 @@ const Classroom = () => {
     const [csvData, setCsvData] = useState([])
     const [loading, setLoading] = useState(false)
     const expressServices = useExpressServices()
-    const [csrf, setCSRF] = useState('')
     const [errors, setErrors] = useState({ processing: false, success: false })
     const [students, setStudents] = useState([])
     const [rowsAreLoading, setRowsAreLoading] = useState(true)
@@ -25,8 +24,12 @@ const Classroom = () => {
     const [classroomInfo, setClassroomInfo] = useState({})
     const [showNameChangePopup, setShowNameChangePopup] = useState(false)
 
+    const [showEditStudentPopup, setShowEditStudentPopup] = useState(false)
+    const [currentlyEditingStudent, setCurrentlyEditingStudent] = useState({})
+
     useEffect(() => {
-        fetch(PROCESSURL + 'check_classroom_exists?'+queryParams, { method: 'GET', credentials: "include" })
+        const token = localStorage.getItem('token')
+        fetch(PROCESSURL + 'check_classroom_exists?'+queryParams, { method: 'GET', credentials: "include", headers: {'Authorization': `Bearer ${token}`} })
             .then((res) => res.json())
             .then((classroom) => {
                 if(!classroom.exists){
@@ -37,22 +40,17 @@ const Classroom = () => {
     }, [navigate])
 
     useEffect(() => {
-        fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-            .then((res) => res.json())
-            .then((response) => {
-                setCSRF(response.csrf)
-                return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
-            })
-            .then((studentsData) => {
-                setStudents(studentsData.students)
-                setClassroomInfo(studentsData.classroom)
-                setRowsAreLoading(false)
-            })
-            .catch((err) => {
-                alert(err.error)
-            })
+        expressServices.retrieveStudents({ classroomId: classroomId })
+        .then((studentsData) => {
+            setStudents(studentsData.students)
+            setClassroomInfo(studentsData.classroom)
+            setRowsAreLoading(false)
+        })
+        .catch((err) => {
+            alert(err.error)
+        })
 
-    }, [])
+    }, [classroomId])
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0]
@@ -80,26 +78,21 @@ const Classroom = () => {
         e.preventDefault()
 
         if (csvData.length > 0) {
-            expressServices.uploadClassroomCSV({classroomId: classroomId, csrf: csrf, csvData: csvData})
+            expressServices.uploadClassroomCSV({classroomId: classroomId, csvData: csvData})
                 .then((result) => {
                     if (result.error) {
                         setErrors({ server_1: result.error })
                     } else {
-                        fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                            .then((res) => res.json())
-                            .then((response) => {
-                                setCSRF(response.csrf)
-                                return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
-                            })
-                            .then((studentsData) => {
-                                setStudents(studentsData.students)
-                                setClassroomInfo(studentsData.classroom)
-                                setCsvData([])
-                                setErrors({ success: "Student Accounts Created" })
-                            })
-                            .catch((err) => {
-                                alert("Failed to fetch students after creation.");
-                            })
+                        expressServices.retrieveStudents({ classroomId: classroomId })
+                        .then((studentsData) => {
+                            setStudents(studentsData.students)
+                            setClassroomInfo(studentsData.classroom)
+                            setCsvData([])
+                            setErrors({ success: "Student Accounts Created" })
+                        })
+                        .catch((err) => {
+                            alert("Failed to fetch students after creation.");
+                        })
                     }
                 })
                 .catch((error) => {
@@ -118,28 +111,22 @@ const Classroom = () => {
     const handleAddStudentForm = (event) => {
         setErrors({ processing: "Please Wait..." })
         event.preventDefault();
-        formData['csrf'] = csrf;
         formData['classroomId'] = classroomId;
         expressServices.addStudent(formData)
         .then((result) => {
             if (!result.status) {
                 setErrors({ server_1: result.error })
             } else {
-                fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                    .then((res) => res.json())
-                    .then((response) => {
-                        setCSRF(response.csrf)
-                        return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
-                    })
-                    .then((studentsData) => {
-                        setStudents(studentsData.students)
-                        setClassroomInfo(studentsData.classroom)
-                        setFormData({})
-                        setErrors({ success: "Student Account Created" })
-                    })
-                    .catch((err) => {
-                        alert("Failed to fetch students after creation.");
-                    })
+                expressServices.retrieveStudents({classroomId: classroomId })
+                .then((studentsData) => {
+                    setStudents(studentsData.students)
+                    setClassroomInfo(studentsData.classroom)
+                    setFormData({})
+                    setErrors({ success: "Student Account Created" })
+                })
+                .catch((err) => {
+                    alert("Failed to fetch students after creation.");
+                })
             }
         })
         .catch((error) => {
@@ -151,7 +138,6 @@ const Classroom = () => {
     const handleNameChangeSubmit = (event) => {
         setErrors({ processing: "Please Wait..." })
         event.preventDefault();
-        formData['csrf'] = csrf;
         formData['classroomId'] = classroomId;
         expressServices.changeClassroomName(formData)
         .then((result) => {
@@ -159,23 +145,18 @@ const Classroom = () => {
                 setErrors({ server_1: JSON.parse(result).error })
             } else {
                 // setRowsAreLoading(true)
-                fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                    .then((res) => res.json())
-                    .then((response) => {
-                        setCSRF(response.csrf)
-                        return expressServices.retrieveStudents({ csrf: response.csrf, classroomId: classroomId })
-                    })
-                    .then((studentsData) => {
-                        setStudents(studentsData.students)
-                        setClassroomInfo(studentsData.classroom)
-                        setFormData({})
-                        setErrors({ success: "Classroom Name Updated" })
-                        navigate(`/admin/classroom?classroomName=${encodeURIComponent(formData['newClassroomName'])}&classroom=${classroomId}`)
-                        // setRowsAreLoading(false)
-                    })
-                    .catch((err) => {
-                        alert("Failed to fetch students after classroom update.");
-                    })
+                expressServices.retrieveStudents({ classroomId: classroomId })
+                .then((studentsData) => {
+                    setStudents(studentsData.students)
+                    setClassroomInfo(studentsData.classroom)
+                    setFormData({})
+                    setErrors({ success: "Classroom Name Updated" })
+                    navigate(`/admin/classroom?classroomName=${encodeURIComponent(formData['newClassroomName'])}&classroom=${classroomId}`)
+                    // setRowsAreLoading(false)
+                })
+                .catch((err) => {
+                    alert("Failed to fetch students after classroom update.");
+                })
             }
         })
         .catch((error) => {
@@ -191,9 +172,75 @@ const Classroom = () => {
         setFormData(values => ({...values, [name]: value}))
     }
 
+    const handleEditStudentChange = (event) => {
+        setFormData({})
+        const name = event.target.name;
+        const value = event.target.value;
+        setFormData(values => ({...values, [name]: value}))
+    }
+
+    const handleEditStudentSubmit = (event) => {
+        setErrors({ processing: "Please Wait..." })
+        event.preventDefault();
+        formData['classroomId'] = classroomId;
+        formData['student_id'] = currentlyEditingStudent.student_id;
+        formData['student_email'] = currentlyEditingStudent.student_email;
+        if(!formData.first_name){
+            formData['first_name'] = currentlyEditingStudent.first_name;
+        }
+        if(!formData.last_name){
+            formData['last_name'] = currentlyEditingStudent.last_name;
+        }
+        expressServices.changeStudentData(formData)
+        .then((result) => {
+            if (JSON.parse(result).status === false) {
+                setErrors({ server_1: JSON.parse(result).error })
+            } else {
+                expressServices.retrieveStudents({ classroomId: classroomId })
+                .then((studentsData) => {
+                    setStudents(studentsData.students)
+                    setClassroomInfo(studentsData.classroom)
+                    setFormData({})
+                    setErrors({ success: "Student Name Updated" })
+                    setCurrentlyEditingStudent({first_name: formData['first_name'], last_name: formData['last_name'], student_id: formData['student_id'], student_email: formData['student_email']})
+                })
+                .catch((err) => {
+                    alert("Failed to fetch students after update.");
+                })
+            }
+        })
+        .catch((error) => {
+            setErrors({ server_1: "An error occurred, please try again." })
+            setLoading(false)
+        })
+    }
+
+    const deleteStudent = (student_id) => {
+        setFormData({})
+        formData['student_id']= student_id
+        formData['classroom_id'] = classroomId
+        expressServices.deleteStudent(formData)
+            .then((result) => {
+                if (result === true) {
+                    expressServices.retrieveStudents({ classroomId: classroomId })
+                    .then((studentsData) => {
+                        setStudents(studentsData.students)
+                        setClassroomInfo(studentsData.classroom)
+                        setFormData({})
+                        alert("Student Removed")
+                    })
+                    .catch((err) => {
+                        alert("Failed to fetch students after deletion.");
+                    })
+                } else {
+                    alert('Failed to delete.')
+                }
+            })
+    }
+
     return (
         <div>
-            <h2>👩‍🏫 Classrooms / {classroomName}</h2>
+            <h2>👩‍🏫 <span onClick={() => navigate(`/admin/`)} style={{cursor: 'pointer'}}>Classrooms</span> / {classroomName}</h2>
 
             <div style={{marginBottom: '10px'}}>
                 <button onClick={() => setShowFileUploadPopUp(true)} style={buttonStyle}>
@@ -424,6 +471,88 @@ const Classroom = () => {
                 </div>
             )}
 
+            {showEditStudentPopup && (
+                 <div style={popupStyles}>
+                    <div style={popupContentStyles}>
+                        <h3 style={{ marginBottom: '10px' }}>Change Student Name</h3>
+                        <form onSubmit={handleEditStudentSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                                <label htmlFor="first_name" style={{ ...labelStyle, width: '150px' }}>First Name</label>
+                                <input 
+                                    type="text"
+                                    name="first_name"
+                                    id="first_name"
+                                    required="required"
+                                    value={formData.first_name || currentlyEditingStudent.first_name}
+                                    onChange={handleEditStudentChange}
+                                    placeholder="Student's First Name"
+                                    style={inputStyle}
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                                <label htmlFor="last_name" style={{ ...labelStyle, width: '150px' }}>Last Name</label>
+                                <input 
+                                    type="text"
+                                    name="last_name"
+                                    id="last_name"
+                                    required="required"
+                                    value={formData.last_name || currentlyEditingStudent.last_name}
+                                    onChange={handleEditStudentChange}
+                                    placeholder="Student's Last Name"
+                                    style={inputStyle}
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                                <label htmlFor="email" style={{ ...labelStyle, width: '150px' }}>Email</label>
+                                <input 
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    required="required"
+                                    value={currentlyEditingStudent.student_email}
+                                    style={inputStyle}
+                                    disabled="disabled"
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                                <label htmlFor="student_id" style={{ ...labelStyle, width: '150px' }}>Student ID</label>
+                                <input 
+                                    type="number"
+                                    name="student_id"
+                                    id="student_id"
+                                    required="required"
+                                    value={currentlyEditingStudent.student_id}
+                                    style={inputStyle}
+                                    disabled="disabled"
+                                />
+                            </div>
+
+                            {errors.server_1 && <p style={{ color: 'red' }}>{errors.server_1}</p>}
+                            {errors.processing && <p style={{ color: 'orange' }}>{errors.processing}</p>}
+                            {errors.success && <p style={{ color: 'green' }}>{errors.success}</p>}
+
+                            <div style={{ marginTop: '10px' }}>
+                                <input
+                                    type="submit"
+                                    value="Update Student Details"
+                                    style={{ ...buttonStyle, marginRight: '10px' }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowEditStudentPopup(false); setErrors({ processing: false, success: false }); setFormData({}); setCurrentlyEditingStudent({}) }}
+                                    style={{...buttonStyle, backgroundColor:'#dd0000'}}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {rowsAreLoading ? (
                 <p>Loading...</p>
             ) : (
@@ -453,7 +582,19 @@ const Classroom = () => {
                                         timeZone: 'UTC',
                                     })}
                                 </td>
-                                <td style={tdStyle}></td>
+                                <td style={tdStyle}>
+                                    <button style={{...buttonStyle, backgroundColor:'transparent', marginRight: '5px'}} onClick={() => {
+                                        setCurrentlyEditingStudent({first_name: student.first_name, last_name: student.last_name, student_id: student.student_id, student_email: student.email})
+                                        setShowEditStudentPopup(true)
+                                    }}>✏️</button>
+                                    <button style={{...buttonStyle, backgroundColor:'#0066dd', marginRight: '5px'}} onClick={() => {navigate(`/admin/student?student=${student.student_id}&studentFN=${student.first_name}&studentLN=${student.last_name}&classroom=${classroomId}&classroomName=${classroomName}`)}} >📊</button>
+                                    <button style={{...buttonStyle, backgroundColor:'gray', marginRight: '5px'}} onClick={() => {
+                                        const confirmation = prompt("This will remove the student from classroom and erase all student records. This action is irreversible! \n\nType CONFIRM to confirm the action.");
+                                        if (confirmation === "CONFIRM"){
+                                            deleteStudent(student.student_id)
+                                        }
+                                    }}>❌</button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

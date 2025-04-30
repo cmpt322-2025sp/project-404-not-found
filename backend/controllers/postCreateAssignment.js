@@ -1,8 +1,7 @@
 const UserFunctions = require("../core/UserFunctions")
 
 const postCreateAssignment = async (req, res) => {
-    if(req.headers['sec-fetch-site'] === 'same-site'){
-        if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
+    if(req.headers.origin === process.env.FRONTEND_URL){
             if (
                 !req.body.assignmentName || 
                 !req.body.assignmentDue || 
@@ -20,7 +19,6 @@ const postCreateAssignment = async (req, res) => {
             }else{
                 res.json({status: false, error: creation.error})
             }
-        }
     }
 }
 

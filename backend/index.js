@@ -1,26 +1,16 @@
 const express = require("express");
 var cors = require('cors');
-const session = require('express-session');
 require('dotenv').config();
 
-const mongodb = require('./core/DatabaseFunctions')
-const MongoDBStore = require('connect-mongodb-session')(session);
-const MONGODB_URI = process.env.MONGODB_URI;
-
-const app = express();
-const port = process.env.EXPRESS_PORT;
+const mongodb = require('./core/DatabaseFunctions');
 const routes = require('./routes');
 
-app.use(cors({
-    origin: true,
-    credentials: true,
-}));
+const app = express();
+const port = process.env.PORT || process.env.EXPRESS_PORT;
 
-app.use(session({
-    secret: process.env.EXPRESS_SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: new MongoDBStore({ uri: MONGODB_URI, collection: process.env.MONGO_SESSIONS })
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
 }));
 
 app.use(express.json());

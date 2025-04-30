@@ -1,11 +1,10 @@
 module.exports = {
-    getCSRF     : require('./getCSRF'),
     getMuffin   : require('./getMuffin'),
     postLogin   : require('./postLogin'),
-    getLogout   : require('./getLogout'),
     getClassroom : require('./getClassroom'),
     getAssignment : require('./getAssignment'),
     getAssignmentExists : require('./getAssignmentExists'),
+    getStudent : require('./getStudent'),
     postCreateClassroom : require('./postCreateClassroom'),
     postRetrieveClassrooms : require('./postRetrieveClassrooms'),
     postDeleteClassroom: require('./postDeleteClassroom'),
@@ -20,5 +19,8 @@ module.exports = {
     postChangeAssignmentDue: require('./postChangeAssignmentDue'),
     postDeleteAssignment: require('./postDeleteAssignment'),
     postChangeClassroomName: require('./postChangeClassroomName'),
+    postChangeStudentData: require('./postChangeStudentData'),
+    postDeleteStudent: require('./postDeleteStudent'),
+    postRetrieveStudentRecords: require('./postRetrieveStudentRecords'),
 
 }

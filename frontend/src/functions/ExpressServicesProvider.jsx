@@ -1,6 +1,14 @@
 import { useContext, createContext } from "react"
 import { PROCESSURL } from "../Const"
 
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('token')
+    return {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    }
+}
+
 const ExpressServicesContext = createContext()
 
 const ExpressServicesProvider = ({ children }) =>{
@@ -9,10 +17,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'create_classroom', { 
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -29,10 +34,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'retrieve_classrooms', { 
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -49,10 +51,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'delete_classroom', { 
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -69,10 +68,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'upload_classroom_csv', {
             method: 'POST',
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -89,10 +85,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'retrieve_students', { 
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -109,10 +102,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'add_student', { 
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -129,10 +119,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'create_assignment', { 
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -149,10 +136,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'retrieve_assignments', { 
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -169,10 +153,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'retrieve_student_assignments', { 
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -189,10 +170,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'auto_save_progress', {
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -209,10 +187,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'retrieve_completions_for_assignment', {
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -229,10 +204,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'change_due_date', {
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -249,10 +221,7 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'delete_assignment', {
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
@@ -269,16 +238,64 @@ const ExpressServicesProvider = ({ children }) =>{
         return fetch(PROCESSURL + 'change_classroom_name', { 
             method: "POST",
             credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                csrf: data.csrf
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
         .then((res) => res.json())
         .then((response) => {
             if(response.status === true){
                 return true
+            }else{
+                return JSON.stringify(response)
+            }
+        })
+    }
+
+    const changeStudentData = (data) => {
+        return fetch(PROCESSURL + 'change_student_data', { 
+            method: "POST",
+            credentials: "include",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return true
+            }else{
+                return JSON.stringify(response)
+            }
+        })
+    }
+
+    const deleteStudent = (data) => {
+        return fetch(PROCESSURL + 'delete_student', {
+            method: "POST",
+            credentials: "include",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return true
+            }else{
+                return false
+            }
+        })
+    }
+
+    const retrieveStudentRecords = (data) => {
+        return fetch(PROCESSURL + 'retrieve_student_records', {
+            method: "POST",
+            credentials: "include",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        })
+        .then((res) => res.json())
+        .then((response) => {
+            if(response.status === true){
+                return {assignmentRecords: response.assignmentRecords, studentInfo: response.studentInfo}
             }else{
                 return JSON.stringify(response)
             }
@@ -300,7 +317,10 @@ const ExpressServicesProvider = ({ children }) =>{
             retrieveAssignmentCompletions,
             changeAssignmentDueDate,
             deleteAssignment,
-            changeClassroomName
+            changeClassroomName,
+            changeStudentData,
+            deleteStudent,
+            retrieveStudentRecords
         }}>{children}</ExpressServicesContext.Provider>
     );
 

@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import bobImage from '../asset/images/bob.png'
 import { useAuth } from "../functions/AuthProvider"
-import { PROCESSURL } from "../Const"
 import { useExpressServices } from "../functions/ExpressServicesProvider"
 import { useNavigate } from 'react-router-dom'
 
 const Assignments = () => {
   const navigate = useNavigate()
-  const [csrf, setCSRF] = useState('')
   const expressServices = useExpressServices()
   const { userFirstName, userId } = useAuth()
   const [assignments, setAssignments] = useState([])
@@ -18,25 +16,22 @@ const Assignments = () => {
   useEffect(() => {
     Object.assign(document.body.style, styles.globalReset);
     
-		fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-			.then((res) => res.json())
-			.then((response) => {
-				setCSRF(response.csrf)
-				return expressServices.retrieveStudentAssignments({csrf:response.csrf, student_id: userId})
-			})
-			.then((assignmentsData) => {
-				if (assignmentsData.error) {
-                    setErrors({ server_1: assignmentsData.error })
-                }else{
-					setAssignments(assignmentsData)
-					setRowsAreLoading(false)
-				}
-			})
-			.catch((err) => {
-				setErrors({ server_1: err.error })
-			})
+		expressServices.retrieveStudentAssignments({ student_id: userId })
+        .then((assignmentsData) => {
+            if (assignmentsData.error) {
+                setErrors({ server_1: assignmentsData.error });
+            } else {
+                setAssignments(assignmentsData);
+            }
+        })
+        .catch((err) => {
+            setErrors({ server_1: err.error });
+        })
+        .finally(() => {
+            setRowsAreLoading(false);
+        })
 
-	}, [])
+	}, [userId])
 
   return (
     <div style={styles.container}>
@@ -152,7 +147,7 @@ const styles = {
     fontSize: '1.6em',
     color: '#fff',
     fontWeight: 'bold',
-    backgroundColor: '#ffcc00',
+    backgroundColor: '#ff1a1a',
     padding: '8px',
     borderRadius: '10px',
     display: 'inline-block',

@@ -2,134 +2,120 @@ import React, { useRef, useEffect, useState } from "react";
 import background from "../../asset/images/background3.png";
 import bobBoard from "../../asset/images/bobBoard.png";
 import bob from "../../asset/images/bob2.png";
+
 import Question from "./Question";
 import GroceryCheckout from "./GroceryCheckout";
+
 import { mainMusic, groceryMusic } from "../../utils/bgMusic";
+
 import startSound from "../../asset/sounds/gameStart.mp3";
+import successSoundFile from "../../asset/sounds/success.mp3";
+import failSoundFile from "../../asset/sounds/fail.wav";
+
+/* ───────────────────────────────────────────────────────────── */
 
 export default function GrocerySelection({ onScoreSubmission }) {
   const fruitEmojis = ["🍎", "🍌", "🍊", "🍓", "🍍", "🍉", "🍇", "🍒", "🍑", "🥭"];
 
-  const audioRef = useRef(null);
-  const startSoundRef = useRef(null);
+  /* audio refs */
+  const successAudioRef = useRef(null);   // ✅ correct ding
+  const failAudioRef = useRef(null);   // ❌ wrong buzz
+  const startSoundRef = useRef(null);   // ▶️ continue button
 
-
-  // Set the volume (or do any other one‑time audio tweaks) on mount
-
+  /* swap background music ----------------------------------- */
   useEffect(() => {
-    mainMusic.pause();            // pause big‑world loop
-    groceryMusic.currentTime = 0; // rewind
-    groceryMusic.play();          // start grocery loop
+    mainMusic.pause();
+    groceryMusic.currentTime = 0;
+    groceryMusic.play().catch(() => { });
 
-    // Cleanup: if user exits by closing popup early
-    return () => groceryMusic.pause();
+    return () => groceryMusic.pause();    // restore when leaving
   }, []);
 
-  // We track total attempts - increments after *every* submission (correct or wrong)
+  /* ---------------------------------------------------------- */
+  /*   GAME STATE                                               */
+  /* ---------------------------------------------------------- */
   const [attempt, setAttempt] = useState(0);
-
   const [winner, setWinner] = useState(false);
   const [nextQuestion, setNextQuestion] = useState(false);
   const [prevQuestion, setPrevQuestion] = useState(null);
   const [score, setScore] = useState(1000);
-
-  // Circles for up to 10 attempts:
-  //  - "🟢" for correct
-  //  - "🟡" for wrong
-  //  - "🔴" for skip
-  //  - "⚫" is unused / not yet attempted
   const [circles, setCircles] = useState(Array(10).fill("⚫"));
-
   const [showCheckout, setShowCheckout] = useState(false);
 
-  // Generate initial question
-  const initialX = Math.floor(Math.random() * 11);
-  const initialY = Math.floor(Math.random() * 11);
-  const initialEmoji =
-    fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)];
-
-  // objectData includes the current question/emoji
-  const [objectData, setObjectData] = useState({
-    x: initialX,
-    y: initialY,
+  /* generate first question */
+  const rand = () => Math.floor(Math.random() * 11);
+  const newQ = () => ({
+    x: rand(),
+    y: rand(),
     color: "white",
-    correctAnswer: initialX + initialY,
-    emoji: initialEmoji,
+    correctAnswer: rand() + rand(),   // reset later anyway
+    emoji: fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)],
+  });
+  const [objectData, setObjectData] = useState(() => {
+    const x = rand(), y = rand();
+    return {
+      x,
+      y,
+      color: "white",
+      correctAnswer: x + y,
+      emoji: fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)],
+    };
   });
 
-  // Helper to color the score
-  const getColor = (s) => {
-    if (s <= 500) return "red";
-    if (s <= 800) return "orange";
-    return "green";
-  };
+  /* colour helper */
+  const getColor = (s) => (s <= 500 ? "red" : s <= 800 ? "orange" : "green");
 
+  /* ---------------------------------------------------------- */
+  /*   ANSWER HANDLER                                           */
+  /* ---------------------------------------------------------- */
   function handleAnswerCheck(userInput) {
-    const numericValue = parseInt(userInput, 10);
-    // Always increment attempt, because the user has tried a submission
-    // but do it at the end, *after* you set circles
-    let wasCorrect = false;
+    const num = parseInt(userInput, 10);
+    const correct = num === objectData.correctAnswer;
 
-    if (numericValue === objectData.correctAnswer) {
-      // Mark this attempt's circle as 🟢
-      setCircles((prev) =>
-        prev.map((c, i) => (i === attempt ? "🟢" : c))
-      );
-      wasCorrect = true;
+    /* update attempt marker */
+    setCircles((prev) =>
+      prev.map((c, i) => (i === attempt ? (correct ? "🟢" : "🟡") : c))
+    );
 
-      // Prepare next question
-      const newX = Math.floor(Math.random() * 11);
-      const newY = Math.floor(Math.random() * 11);
-      const newEmoji =
-        fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)];
-
+    if (correct) {
+      successAudioRef.current?.play().catch(() => { });
+      /* new question */
+      const x = rand(), y = rand();
       setObjectData({
-        x: newX,
-        y: newY,
+        x, y,
         color: "white",
-        correctAnswer: newX + newY,
-        emoji: newEmoji,
+        correctAnswer: x + y,
+        emoji: fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)],
       });
-
     } else {
-      // Mark this attempt's circle as 🟡
-      setCircles((prev) =>
-        prev.map((c, i) => (i === attempt ? "🟡" : c))
-      );
-      // Subtract points for each wrong attempt
-      setScore((prevScore) => prevScore - 50);
-
-      // If you want them to move on to next question even if wrong:
-      //   just generate new question below like we do for correct
-      // If you want them to stay on the same question until correct:
-      //   do nothing special for generating the next question here
-      //
-      // For demonstration, let's keep the same question. The user can keep trying.
-      // So we do NOT change objectData or generate a new one yet.
+      failAudioRef.current?.play().catch(() => { });
+      setScore((p) => p - 50);
     }
 
-    // Now increment attempt
-    setAttempt((prev) => {
-      const newAttempt = prev + 1;
-      // If we've used up 10 attempts or the score is too low:
-      if (newAttempt >= 10 || score <= 50) {
-        setWinner(true);
-      }
-      return newAttempt;
+    /* next attempt & check for game-over */
+    setAttempt((p) => {
+      const n = p + 1;
+      if (n >= 10 || score - (correct ? 0 : 50) <= 50) setWinner(true);
+      return n;
     });
   }
 
+  /* ---------------------------------------------------------- */
+  /*   BRANCH INTO CHECKOUT GAME                                */
+  /* ---------------------------------------------------------- */
   if (showCheckout) {
-    // Add 1000 to the final score for the next game
-    const updatedScore = score + 1000;
+    const updated = score + 1000;   // bonus for next game
     return (
       <GroceryCheckout
-        previousScore={updatedScore}
+        previousScore={updated}
         onScoreSubmission={onScoreSubmission}
       />
     );
   }
 
+  /* ---------------------------------------------------------- */
+  /*   RENDER                                                   */
+  /* ---------------------------------------------------------- */
   return (
     <div
       style={{
@@ -139,6 +125,8 @@ export default function GrocerySelection({ onScoreSubmission }) {
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "absolute",
+        inset: 0,
+        background: `url(${background}) center/cover no-repeat`,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-evenly",
@@ -150,8 +138,8 @@ export default function GrocerySelection({ onScoreSubmission }) {
         overflow: "hidden",
       }}
     >
+      {/* header with SKIP */}
       <div
-        id="header"
         style={{
           backgroundImage: `url(${bobBoard})`,
           height: "100px",
@@ -171,44 +159,29 @@ export default function GrocerySelection({ onScoreSubmission }) {
               marginTop: "20%",
             }}
             onClick={() => {
-              // SKIP logic
               if (score > 0 && attempt < 10) {
-                setScore((prev) => prev - 100);
-                setPrevQuestion(objectData.correctAnswer);
+                /* ★ play fail sound for a skipped question */
+                failAudioRef.current?.play().catch(() => {});
 
-                // If they skip, we mark the circle as 🔴
-                setCircles((prevCircles) =>
-                  prevCircles.map((c, i) => (i === attempt ? "🔴" : c))
+                setScore((p) => p - 100);
+                setPrevQuestion(objectData.correctAnswer);
+                setCircles((prev) =>
+                  prev.map((c, i) => (i === attempt ? "🔴" : c))
                 );
 
-                // Move on to next question
-                const newX = Math.floor(Math.random() * 11);
-                const newY = Math.floor(Math.random() * 11);
-                const newEmoji =
-                  fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)];
-
+                /* next question */
+                const x = rand(), y = rand();
                 setObjectData({
-                  x: newX,
-                  y: newY,
+                  x, y,
                   color: "white",
-                  correctAnswer: newX + newY,
-                  emoji: newEmoji,
+                  correctAnswer: x + y,
+                  emoji: fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)],
                 });
 
-                // Show the "prev question" label
                 setNextQuestion(true);
-                setTimeout(() => {
-                  setNextQuestion(false);
-                }, 1000);
+                setTimeout(() => setNextQuestion(false), 1000);
 
-                // Advance attempt by 1
-                setAttempt((prev) => {
-                  const newAttempt = prev + 1;
-                  if (newAttempt >= 10 || score <= 50) {
-                    setWinner(true);
-                  }
-                  return newAttempt;
-                });
+                setAttempt((p) => (p + 1 >= 10 ? setWinner(true) : p + 1));
               }
             }}
           >
@@ -217,7 +190,7 @@ export default function GrocerySelection({ onScoreSubmission }) {
         )}
       </div>
 
-      {/* Our question component just displays question & emoji, plus an input */}
+      {/* QUESTION COMPONENT */}
       <Question
         x={objectData.x}
         y={objectData.y}
@@ -259,12 +232,12 @@ export default function GrocerySelection({ onScoreSubmission }) {
             fontFamily: "Impact",
             color: getColor(score),
           }}
-          key={circles.join("") + "_key_for_score"}
         >
           {score}
         </p>
       </div>
 
+      {/* WINNER PANEL */}
       {winner && (
         <div
           style={{
@@ -287,15 +260,10 @@ export default function GrocerySelection({ onScoreSubmission }) {
           >
             SCORE: {score} 🎉
           </h1>
-          {/* "Continue" button that triggers the next game */}
+
           <button
             onClick={() => {
-              if (startSoundRef.current) {
-                startSoundRef.current.currentTime = 0;
-                startSoundRef.current.play().catch(() => { });
-              }
-
-              // Slight delay to let sound play before switching screens
+              startSoundRef.current?.play().catch(() => { });
               setTimeout(() => setShowCheckout(true), 800);
             }}
             style={{
@@ -313,10 +281,10 @@ export default function GrocerySelection({ onScoreSubmission }) {
           >
             Continue
           </button>
-          <audio ref={startSoundRef} src={startSound} />
         </div>
       )}
 
+      {/* previous-question flash */}
       {nextQuestion && (
         <div
           style={{
@@ -342,6 +310,7 @@ export default function GrocerySelection({ onScoreSubmission }) {
         </div>
       )}
 
+      {/* Bob sprite */}
       <div
         style={{
           position: "absolute",
@@ -354,6 +323,11 @@ export default function GrocerySelection({ onScoreSubmission }) {
           left: "55%",
         }}
       />
+
+      {/* hidden audio tags */}
+      <audio ref={successAudioRef} src={successSoundFile} />
+      <audio ref={failAudioRef} src={failSoundFile} />
+      <audio ref={startSoundRef} src={startSound} />
     </div>
   );
 }

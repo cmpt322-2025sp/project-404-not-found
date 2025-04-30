@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom'
 const Classrooms = () => {
     const navigate = useNavigate()
 
-    const [csrf, setCSRF] = useState('')
     const [formData, setFormData] = useState({})
     const [errors, setErrors] = useState({ processing: false, success: false })
     const expressServices = useExpressServices()
@@ -16,19 +15,14 @@ const Classrooms = () => {
     const [showPopup, setShowPopup] = useState(false)
 
     useEffect(() => {
-        fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-            .then((res) => res.json())
-            .then((response) => {
-                setCSRF(response.csrf)
-                return expressServices.retrieveClassrooms({ csrf: response.csrf });
-            })
-            .then((classroomsData) => {
-                setClassrooms(classroomsData)
-                setRowsAreLoading(false)
-            })
-            .catch((err) => {
-                alert(err.error)
-            })
+        expressServices.retrieveClassrooms()
+        .then((classroomsData) => {
+            setClassrooms(classroomsData)
+            setRowsAreLoading(false)
+        })
+        .catch((err) => {
+            alert(err.error)
+        })
 
     }, [])
 
@@ -44,7 +38,6 @@ const Classrooms = () => {
             setErrors({ server_1: "Classroom name is required" })
             return
         }
-        formData['csrf'] = csrf;
 
         expressServices.createClassroom(formData)
             .then((result) => {
@@ -53,20 +46,15 @@ const Classrooms = () => {
                 if (result.error) {
                     setErrors({ server_1: result.error })
                 } else {
-                    fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                        .then((res) => res.json())
-                        .then((response) => {
-                            setCSRF(response.csrf)
-                            return expressServices.retrieveClassrooms({ csrf: response.csrf })
-                        })
-                        .then((classroomsData) => {
-                            setClassrooms(classroomsData)
-                            setFormData({})
-                            setErrors({ success: "Classroom Created" })
-                        })
-                        .catch((err) => {
-                            alert("Failed to fetch classrooms after creation.");
-                        })
+                    expressServices.retrieveClassrooms()
+                    .then((classroomsData) => {
+                        setClassrooms(classroomsData)
+                        setFormData({})
+                        setErrors({ success: "Classroom Created" })
+                    })
+                    .catch((err) => {
+                        alert("Failed to fetch classrooms after creation.");
+                    })
                 }
             })
             .catch(err => {
@@ -75,25 +63,19 @@ const Classrooms = () => {
     }
 
     const handleDelete = (classroomId) => {
-        formData['csrf'] = csrf
         formData['classroomId']= classroomId
         expressServices.deleteClassroom(formData)
             .then((result) => {
                 if (result === true) {
-                    fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                        .then((res) => res.json())
-                        .then((response) => {
-                            setCSRF(response.csrf)
-                            return expressServices.retrieveClassrooms({ csrf: response.csrf })
-                        })
-                        .then((classroomsData) => {
-                            setClassrooms(classroomsData)
-                            setFormData({})
-                            alert("Classroom Deleted")
-                        })
-                        .catch((err) => {
-                            alert("Failed to fetch classrooms after deletion.");
-                        })
+                    expressServices.retrieveClassrooms()
+                    .then((classroomsData) => {
+                        setClassrooms(classroomsData)
+                        setFormData({})
+                        alert("Classroom Deleted")
+                    })
+                    .catch((err) => {
+                        alert("Failed to fetch classrooms after deletion.");
+                    })
                 } else {
                     alert('Failed to delete.')
                 }
