@@ -67,7 +67,7 @@ const Balloon = (props) => {
                 fontSize: "24px"
             }}
         >
-           {!correct && <h1 style={{  position: "absolute", fontSize: "30px" , top: "10%", left: "25%"}}>{originalX} - {originalY}</h1>}
+           {!correct && <h1 style={{  position: "absolute", fontSize: "30px" , top: "10%", left: "25%"}}>{originalX} &#8722; {originalY}</h1>}
            {correct && <h1 style={{ position: "absolute", fontSize: "30px" , top: "10%", left: "35%"}}>✅</h1>}
               </div>
     );

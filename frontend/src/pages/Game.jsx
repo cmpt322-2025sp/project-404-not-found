@@ -8,7 +8,7 @@ import Egg from "../components/Egg"
 import ProgressBar from "../components/ProgressBar"
 import { character_speed, character_dimension, character_initial_position, island_positions } from "../Const"
 import { useExpressServices } from "../functions/ExpressServicesProvider"
-
+import GameButtons from "../components/GameButtons";
 const Game = () => {
     const navigate = useNavigate()
     const location = useLocation()
@@ -188,8 +188,10 @@ const Game = () => {
             {scores["Bob Cleans"] === 0 && (
                 <Egg position={object_3_position} is_colliding={is_colliding_3} game="Bob Cleans" onScore={handleScoreFromEgg} />
             )}
+           <GameButtons movePlayer={movePlayer} />
             <ProgressBar scores={scores} eggs_collected={collectedEggs} />
-
+            
+            
             {showCongrats && (
                 <div
                     style={{
@@ -218,6 +220,7 @@ const Game = () => {
             )}
 
         </Playground>
+        
     );
 }
 
