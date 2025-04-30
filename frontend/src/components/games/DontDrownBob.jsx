@@ -6,37 +6,40 @@ import bob from "../../asset/images/bob2.png";
 import Balloon from "./Balloon";
 import Bob from "./Bob";
 import { mainMusic, BobDrownsMusic } from "../../utils/bgMusic";
+import successSoundFile from "../../asset/sounds/success.mp3";
+import failSoundFile from "../../asset/sounds/fail.wav";
+import startSound from "../../asset/sounds/gameStart.mp3";
 
 const DontDrownBob = ({ onScoreSubmission }) => {
-    const answerRef = useRef(null);
 
+    const playOneShot = (src, volume = 1) => {
+        const audio = new Audio(src);
+        audio.volume = volume;
+        audio.play().catch(() => {});
+    };
+    /* ─────────────────────────── refs for audio ────────────────────────── */
+    const answerRef = useRef(null);
+    const successAudioRef = useRef(null);
+    const failAudioRef = useRef(null);
+    const startAudioRef = useRef(null);
+
+    /* ─────────────────────────── state ─────────────────────────────────── */
     const [death, setDeath] = useState(false);
     const [start, setStart] = useState(true);
-    const xaxis = ["20", "28", "36", "44", "52", "60", "68", "76"];
-    const [originalXs] = useState([
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-        Math.floor(Math.random() * 11),
-    ]);
-    const [originalYs] = useState([
-        Math.floor(Math.random() * originalXs[0]),
-        Math.floor(Math.random() * originalXs[1]),
-        Math.floor(Math.random() * originalXs[2]),
-        Math.floor(Math.random() * originalXs[3]),
-        Math.floor(Math.random() * originalXs[4]),
-        Math.floor(Math.random() * originalXs[5]),
-        Math.floor(Math.random() * originalXs[6]),
-        Math.floor(Math.random() * originalXs[7]),
-    ]);
-    const [bobOnBalloon, setBobOnBalloon] = useState(1);
-    const [score, setScore] = useState(0);
     const [gameOver, setGameOver] = useState(false);
 
+    const xaxis = ["20", "28", "36", "44", "52", "60", "68", "76"];
+    const [originalXs] = useState(
+        Array.from({ length: 8 }, () => Math.floor(Math.random() * 11))
+    );
+    const [originalYs] = useState(
+        originalXs.map((x) => Math.floor(Math.random() * x))
+    );
+
+    const [bobOnBalloon, setBobOnBalloon] = useState(1);
+    const [score, setScore] = useState(0);
+
+    /* ────────────────────────── music hand-off ─────────────────────────── */
     useEffect(() => {
         mainMusic.pause();
         BobDrownsMusic.currentTime = 0;
@@ -47,56 +50,61 @@ const DontDrownBob = ({ onScoreSubmission }) => {
         };
     }, []);
 
+    /* focus the input whenever needed */
     useEffect(() => {
-        if (!start && !death && !gameOver && answerRef.current) {
-            answerRef.current.focus();
-        }
+        if (!start && !death && !gameOver) answerRef.current?.focus();
     }, [start, death, gameOver, bobOnBalloon]);
 
-    const handleGameOver = () => setGameOver(true);
-
+    /* ─────────────────────── answer submission ─────────────────────────── */
     const handleClick = () => {
         if (!answerRef.current) return;
+
         const attempt = Number(answerRef.current.value.trim());
-        const correct =
-            originalXs[bobOnBalloon - 1] - originalYs[bobOnBalloon - 1];
+        const correct = originalXs[bobOnBalloon - 1] - originalYs[bobOnBalloon - 1];
 
         if (attempt === correct) {
+            /* ✓ right answer */
+            successAudioRef.current?.play().catch(() => { });
+            playOneShot(successSoundFile);
+
             setBobOnBalloon((prev) => {
                 const next = prev + 1;
-                if (next === 9) setDeath(true);
+                if (next === 9) setDeath(true);         // reached last balloon
                 return next;
             });
             setScore((s) => s + 12.5);
-
-            /* clear & refocus */
-            answerRef.current.value = "";
-            answerRef.current.focus();
+        } else {
+            /* ✗ wrong answer */
+            failAudioRef.current?.play().catch(() => { });
+            playOneShot(failSoundFile);
         }
+
+        /* clear & refocus the input regardless */
+        answerRef.current.value = "";
+        answerRef.current.focus();
     };
 
+    /* finish */
     const submitScore = () => onScoreSubmission(Math.round(score));
 
+    /* ─────────────────────────── UI ────────────────────────────────────── */
     return (
         <div
             style={{
                 backgroundImage: `url(${background})`,
                 position: "absolute",
-                top: 0,
-                left: 0,
+                inset: 0,
                 padding: "5%",
                 boxSizing: "border-box",
                 overflow: "hidden",
-                height: "100%",
-                width: "100%",
                 display: "flex",
-                justifyContent: "space-evenly",
                 flexDirection: "column",
+                justifyContent: "space-evenly",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
             }}
         >
-            {/* Bob (alive) */}
+            {/* Bob */}
             {!start && !death && !gameOver && (
                 <Bob
                     x={Number(xaxis[bobOnBalloon - 1]) - 5}
@@ -131,9 +139,7 @@ const DontDrownBob = ({ onScoreSubmission }) => {
             />
 
             {/* Balloons */}
-            {!start &&
-                !death &&
-                !gameOver &&
+            {!start && !death && !gameOver &&
                 [...Array(8)].map((_, i) => (
                     <Balloon
                         key={i}
@@ -142,14 +148,13 @@ const DontDrownBob = ({ onScoreSubmission }) => {
                         originalX={originalXs[i]}
                         originalY={originalYs[i]}
                         bobOnBalloon={bobOnBalloon}
-                        gameOver={handleGameOver}
+                        gameOver={() => setGameOver(true)}
                     />
                 ))}
 
-            {/* Answer box */}
+            {/* Input box */}
             {!gameOver && !death && (
                 <input
-                    id="answer"
                     ref={answerRef}
                     autoFocus
                     style={{
@@ -182,45 +187,24 @@ const DontDrownBob = ({ onScoreSubmission }) => {
                 </button>
             )}
 
-            {/* Death Screen */}
+            {/* --------- VICTORY (death == true because Bob reached shore) -------- */}
             {death && (
-                <div
-                    style={{
-                        position: "absolute",
-                        top: "35%",
-                        left: "52%",
-                        transform: "translate(-40%, -30%)",
-                        backgroundColor: "rgba(0, 0, 0, 0.7)",
-                        padding: "20px",
-                        color: "white",
-                        fontSize: "30px",
-                    }}
-                >
+                <div style={overlayStyle}>
                     <h1>Victorious!</h1>
                     <p>Your score: {score}</p>
                     <button
-                        style={{
-                            marginTop: "5%",
-                            padding: "4% 10%",
-                            cursor: "pointer",
-                            backgroundColor: "#4CAF50",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "12px",
-                            fontSize: "1rem",
-                            boxShadow: "0 3px 5px rgba(0, 0, 0, 0.3)",
-                            transition: "transform 0.1s",
+                        style={btnStyle}
+                        onClick={() => {
+                            startAudioRef.current?.play().catch(() => { });
+                            setTimeout(submitScore, 800);
                         }}
-                        onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
-                        onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
-                        onClick={submitScore}
                     >
                         Continue
                     </button>
                 </div>
             )}
 
-            {/* Game-Over overlay & logo */}
+            {/* --------- GAME OVER (fell) --------------------------------------- */}
             {gameOver && (
                 <>
                     <div
@@ -235,41 +219,20 @@ const DontDrownBob = ({ onScoreSubmission }) => {
                             top: "-5%",
                         }}
                     />
-                    <div
-                        style={{
-                            position: "absolute",
-                            top: "35%",
-                            left: "52%",
-                            transform: "translate(-41%, -20%)",
-                            backgroundColor: "rgba(0, 0, 0, 0.7)",
-                            padding: "20px",
-                            color: "white",
-                            fontSize: "30px",
-                        }}
-                    >
+                    <div style={{ ...overlayStyle, top: "35%" }}>
                         <h1>Game Over</h1>
                         <p>Your score: {score}</p>
-                        <p style={{ fontSize: "20px" }}>
-                            Correct Answer for {originalXs[bobOnBalloon - 1]} -{" "}
-                            {originalYs[bobOnBalloon - 1]} ={" "}
+                        <p style={{ fontSize: 20 }}>
+                            Correct Answer for&nbsp;
+                            {originalXs[bobOnBalloon - 1]} - {originalYs[bobOnBalloon - 1]} =
                             {originalXs[bobOnBalloon - 1] - originalYs[bobOnBalloon - 1]}
                         </p>
                         <button
-                            style={{
-                                marginTop: "5%",
-                                padding: "4% 10%",
-                                cursor: "pointer",
-                                backgroundColor: "#4CAF50",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "12px",
-                                fontSize: "1rem",
-                                boxShadow: "0 3px 5px rgba(0, 0, 0, 0.3)",
-                                transition: "transform 0.1s",
+                            style={btnStyle}
+                            onClick={() => {
+                                startAudioRef.current?.play().catch(() => { });
+                                setTimeout(submitScore, 800);
                             }}
-                            onMouseDown={(e) => (e.target.style.transform = "scale(0.95)")}
-                            onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
-                            onClick={submitScore}
                         >
                             Continue
                         </button>
@@ -282,116 +245,101 @@ const DontDrownBob = ({ onScoreSubmission }) => {
                 <div
                     style={{
                         position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
+                        inset: 0,
                         backgroundColor: "#A5B68D",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        overflow: "hidden",
                     }}
                 >
-                    {/* Decorative Bobs */}
-                    <img
-                        src={bob}
-                        alt=""
-                        style={{
-                            position: "absolute",
-                            top: "10%",
-                            left: "5%",
-                            height: "180px",
-                            opacity: 0.6,
-                        }}
-                    />
-                    <img
-                        src={bob}
-                        alt=""
-                        style={{
-                            position: "absolute",
-                            top: "10%",
-                            right: "5%",
-                            height: "180px",
-                            opacity: 0.6,
-                            transform: "scaleX(-1)",
-                        }}
-                    />
+                    {/* decorative bobs */}
+                    <img src={bob} alt="" style={{ position: "absolute", top: "10%", left: "5%", height: 180, opacity: 0.6 }} />
+                    <img src={bob} alt="" style={{ position: "absolute", top: "10%", right: "5%", height: 180, opacity: 0.6, transform: "scaleX(-1)" }} />
 
-                    {/* Center Panel */}
-                    <div
-                        style={{
-                            position: "relative",
-                            width: "90%",
-                            maxWidth: "700px",
-                            padding: "2rem",
-                            backgroundColor: "rgba(255,255,255,0.9)",
-                            borderRadius: "12px",
-                            boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
-                            textAlign: "center",
-                        }}
-                    >
-                        {/* Logo */}
-                        <img
-                            src={logo}
-                            alt="Dont Drown Bob"
-                            style={{
-                                width: "60%",
-                                maxWidth: "300px",
-                                marginBottom: "1.5rem",
-                            }}
-                        />
-
-                        {/* Instructions */}
-                        <p
-                            style={{
-                                fontFamily: "Arial, sans-serif",
-                                fontSize: "1.1rem",
-                                color: "#333",
-                                lineHeight: 1.4,
-                                marginBottom: "2rem",
-                            }}
-                        >
+                    {/* panel */}
+                    <div style={panelStyle}>
+                        <img src={logo} alt="Dont Drown Bob" style={{ width: "60%", maxWidth: 300, marginBottom: "1.5rem" }} />
+                        <p style={instrStyle}>
                             Make sure BOB doesn’t drown! Jump from balloon to balloon by
                             quickly solving math problems. Bob’s on the hefty side, so speed is
                             key!
                         </p>
-
-                        {/* Arrows */}
-                        <div
-                            style={{ marginTop: "1.5rem", fontSize: "2rem", color: "#4CAF50" }}
-                        >
-                            ⬇️⬇️⬇️
-                        </div>
-
-                        {/* Start Button */}
+                        <div style={{ marginTop: "1.5rem", fontSize: "2rem", color: "#4CAF50" }}>⬇️⬇️⬇️</div>
                         <button
-                            onClick={() => setStart(false)}
-                            style={{
-                                fontFamily: "Arial, sans-serif",
-                                fontSize: "1.25rem",
-                                padding: "0.75rem 2rem",
-                                backgroundColor: "#4CAF50",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "8px",
-                                cursor: "pointer",
-                                transition: "background-color 0.2s ease",
+                            onClick={() => {
+                                startAudioRef.current?.play().catch(() => { });
+                                setTimeout(() => setStart(false), 600);
                             }}
-                            onMouseOver={(e) =>
-                                (e.currentTarget.style.backgroundColor = "#45A049")
-                            }
-                            onMouseOut={(e) =>
-                                (e.currentTarget.style.backgroundColor = "#4CAF50")
-                            }
+                            style={startBtn}
                         >
                             START
                         </button>
                     </div>
                 </div>
             )}
+
+            {/* hidden audio elements */}
+            <audio ref={successAudioRef} src={successSoundFile} />
+            <audio ref={failAudioRef} src={failSoundFile} />
+            <audio ref={startAudioRef} src={startSound} />
         </div>
     );
+};
+
+/* ---------------------------- styles ---------------------------------- */
+const overlayStyle = {
+    position: "absolute",
+    top: "35%",
+    left: "52%",
+    transform: "translate(-40%, -30%)",
+    backgroundColor: "rgba(0,0,0,0.7)",
+    padding: 20,
+    color: "#fff",
+    fontSize: 30,
+    textAlign: "center",
+};
+
+const btnStyle = {
+    marginTop: "5%",
+    padding: "4% 10%",
+    cursor: "pointer",
+    backgroundColor: "#4CAF50",
+    color: "#fff",
+    border: "none",
+    borderRadius: 12,
+    fontSize: "1rem",
+    boxShadow: "0 3px 5px rgba(0,0,0,0.3)",
+};
+
+const panelStyle = {
+    position: "relative",
+    width: "90%",
+    maxWidth: 700,
+    padding: "2rem",
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 12,
+    boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+    textAlign: "center",
+};
+
+const instrStyle = {
+    fontFamily: "Arial, sans-serif",
+    fontSize: "1.1rem",
+    color: "#333",
+    lineHeight: 1.4,
+    marginBottom: "2rem",
+};
+
+const startBtn = {
+    fontFamily: "Arial, sans-serif",
+    fontSize: "1.25rem",
+    padding: "0.75rem 2rem",
+    backgroundColor: "#4CAF50",
+    color: "#fff",
+    border: "none",
+    borderRadius: 8,
+    cursor: "pointer",
+    transition: "background-color 0.2s ease",
 };
 
 export default DontDrownBob;

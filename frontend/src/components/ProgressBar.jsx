@@ -49,8 +49,7 @@ const ProgressBar = ({ scores, eggs_collected, preview=false }) => {
 }
 
 const containerStyle = {
-    width: "100%",
-    maxWidth: "180px",
+    width: "14%",
     margin: "0 auto",
     padding: "8px",
     border: "3px solid #ffcc00",
