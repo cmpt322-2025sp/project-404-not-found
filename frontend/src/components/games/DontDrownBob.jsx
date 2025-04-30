@@ -159,7 +159,7 @@ const DontDrownBob = ({ onScoreSubmission }) => {
                     autoFocus
                     style={{
                         position: "absolute",
-                        left: "43%",
+                        left: "38%",
                         bottom: "20%",
                         width: "19%",
                         height: "10%",
@@ -169,12 +169,54 @@ const DontDrownBob = ({ onScoreSubmission }) => {
                 />
             )}
 
+            {/* Number's pad */}
+            {!gameOver && !death && (
+            <div
+                style={{
+                position: "absolute",
+                bottom: "5%",
+                left: "58%",
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "0.3%",
+                width: "10%",
+                }}
+            >
+                {["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "←"].map((key) => (
+                <button
+                    key={key}
+                    onClick={() => {
+                    if (!answerRef.current) return;
+                    if (key === "←") {
+                        answerRef.current.value = answerRef.current.value.slice(0, -1);
+                    } else {
+                        answerRef.current.value += key;
+                    }
+                    }}
+                    style={{
+                    width: "100%",
+                    aspectRatio: "1",
+                    fontSize: "1.2rem",
+                    borderRadius: "0.5rem",
+                    backgroundColor: "#547792",
+                    color: "white",
+                    border: "2px solid white",
+                    cursor: "pointer",
+                    }}
+                >
+                    {key}
+                </button>
+                ))}
+            </div>
+            )}
+
+
             {/* Send button */}
             {!gameOver && !death && (
                 <button
                     style={{
                         position: "absolute",
-                        left: "43%",
+                        left: "37.8%",
                         bottom: "15%",
                         width: "20%",
                         height: "5%",
