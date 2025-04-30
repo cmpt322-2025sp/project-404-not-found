@@ -2,7 +2,6 @@ const { UpdateDocuments, FindDocument } = require("../core/DatabaseFunctions")
 
 const postChangeStudentData = async (req, res) => {
     if(req.headers.origin === process.env.FRONTEND_URL){
-        if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             try {
                 const student = await FindDocument('users', {student_id: req.body.student_id})
                 if (!student){
@@ -15,7 +14,6 @@ const postChangeStudentData = async (req, res) => {
             } catch {
                 res.status(500).json({ status: false, error: 'An error occurred while updating student.' })
             }
-        }
     }
 }
 

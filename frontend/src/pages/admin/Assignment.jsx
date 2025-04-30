@@ -16,13 +16,13 @@ const Assignment = () => {
     const [completions, setCompletions] = useState([])
     const [info, setInfo] = useState({})
     const [rowsAreLoading, setRowsAreLoading] = useState(true)
-    const [csrf, setCSRF] = useState('')
     const [showDueChangePopup, setShowDueChangePopup] = useState(false)
     const [formData, setFormData] = useState({})
     const [errors, setErrors] = useState({ processing: false, success: false })
 
     useEffect(() => {
-        fetch(PROCESSURL + 'check_assignment_exists?'+queryParams, { method: 'GET', credentials: "include" })
+        const token = localStorage.getItem('token')
+        fetch(PROCESSURL + 'check_assignment_exists?'+queryParams, { method: 'GET', credentials: "include", headers: {'Authorization': `Bearer ${token}`} })
             .then((res) => res.json())
             .then((assignment) => {
                 if(!assignment.exists){
@@ -32,22 +32,16 @@ const Assignment = () => {
     }, [navigate])
 
     useEffect(() => {
-        fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-            .then((res) => res.json())
-            .then((response) => {
-                setCSRF(response.csrf)
-                return expressServices.retrieveAssignmentCompletions({ csrf: response.csrf, assignment_id: assignmentId });
-            })
+        expressServices.retrieveAssignmentCompletions({ assignment_id: assignmentId })
             .then((completionData) => {
-                setCompletions(completionData.completions)
-                setInfo(completionData.assignment_info)
-                setRowsAreLoading(false)
+                setCompletions(completionData.completions);
+                setInfo(completionData.assignment_info);
+                setRowsAreLoading(false);
             })
             .catch((err) => {
-                alert(err.error)
-            })
-    
-    }, [])
+                alert(err.error);
+            });
+    }, [assignmentId]);    
 
     const handleChange = (event) => {
         const name = event.target.name
@@ -58,31 +52,24 @@ const Assignment = () => {
     const handleSubmit = (event) => {
         setErrors({ processing: "Please Wait..." })
         event.preventDefault();
-        formData['csrf'] = csrf;
         formData['assignment_id'] = assignmentId;
         expressServices.changeAssignmentDueDate(formData)
             .then((result) => {
                 if (result.error) {
                     setErrors({ server_1: result.error })
                 } else {
-                    // setRowsAreLoading(true)
-                    fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-                        .then((res) => res.json())
-                        .then((response) => {
-                            setCSRF(response.csrf)
-                            setFormData([])
-                            setErrors({ success: "Due Date Changed" })
-                            return expressServices.retrieveAssignmentCompletions({ csrf: response.csrf, assignment_id: assignmentId })
-                        })
+                    setFormData([]);
+                    setErrors({ success: "Due Date Changed" });
+                
+                    expressServices.retrieveAssignmentCompletions({ assignment_id: assignmentId })
                         .then((completionData) => {
-                            setCompletions(completionData.completions)
-                            setInfo(completionData.assignment_info)
-                            // setRowsAreLoading(false)
+                            setCompletions(completionData.completions);
+                            setInfo(completionData.assignment_info);
                         })
                         .catch((err) => {
-                            alert(err.error)
-                        })
-                }
+                            alert(err.error);
+                        });
+                }                
             })
             .catch((error) => {
                 setErrors({ server_1: "An error occurred, please try again." })

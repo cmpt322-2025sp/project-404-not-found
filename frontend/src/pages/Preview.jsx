@@ -100,16 +100,10 @@ const Preview = () => {
     return (
         <Playground assignment="Preview">
             <Character position={character_position} movePlayer={movePlayer} ></Character>
-            {scores["Dont Drown Bob"] === 0 && (
                 <Egg position={object_1_position} is_colliding={is_colliding_1} game="Dont Drown Bob" onScore={handleScoreFromEgg} />
-            )}
-            {scores["Grocery Store"] === 0 && (
                 <Egg position={object_2_position} is_colliding={is_colliding_2} game="Grocery Store" onScore={handleScoreFromEgg} />
-            )}
-            {scores["Bob Cleans"] === 0 && (
                 <Egg position={object_3_position} is_colliding={is_colliding_3} game="Bob Cleans" onScore={handleScoreFromEgg} />
-            )}
-            <ProgressBar scores={scores}></ProgressBar>
+            <ProgressBar scores={scores} preview={true}></ProgressBar>
         </Playground>
     );
 }

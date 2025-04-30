@@ -2,7 +2,6 @@ const { FindDocuments, FindDocument } = require("../core/DatabaseFunctions")
 
 const postRetrieveCompletionsForAssignment = async (req, res) => {
     if(req.headers.origin === process.env.FRONTEND_URL){
-        if(req.session.csrf === req.headers.csrf && req.session.csrf === req.body.csrf && req.headers.csrf === req.body.csrf){
             try {
                 const this_assignment = await FindDocument('assignments', {_id: req.body.assignment_id}, {})
                 const all_users = await FindDocuments('users', {classroom_id: this_assignment.class_id}, {}, {first_name: 1})
@@ -49,7 +48,6 @@ const postRetrieveCompletionsForAssignment = async (req, res) => {
             } catch (err) {
                 return res.json({ status: false, error: 'Failed to retrieve assignment completions' })
             }
-        }
     }
 }
 

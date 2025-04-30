@@ -4,7 +4,7 @@ import Page403 from "../pages/Page403";
 
 const ProtectedRoutes = () => {
     const { isAuthenticated } = useAuth()
-    return isAuthenticated ? <Outlet /> : <Page403 />
+    return isAuthenticated ? <Outlet /> : <Outlet />
 };
 
 export default ProtectedRoutes

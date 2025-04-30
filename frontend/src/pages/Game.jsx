@@ -22,22 +22,10 @@ const Game = () => {
     const [showCongrats, setShowCongrats] = useState(false)
 
     const expressServices = useExpressServices()
-    const [csrf, setCSRF] = useState('')
 
     if (!urlRefAssignmentName || !urlRefAssignmentId || !urlRefClassroomId) {
         navigate('/assignments')
     }
-
-    useEffect(() => {
-        fetch(PROCESSURL + 'csrf', { method: 'GET', credentials: "include" })
-            .then((res) => res.json())
-            .then((response) => {
-                setCSRF(response.csrf);
-            })
-            .catch((err) => {
-                alert(err.error);
-            })
-    }, []);
 
     const [scores, setScores] = useState({
         "Dont Drown Bob": 0,
@@ -48,7 +36,8 @@ const Game = () => {
     const [collectedEggs, setCollectedEggs] = useState(0)
 
     useEffect(() => {
-        fetch(PROCESSURL + 'check_assignment_exists_for_student?user_id=' + userId + '&' + queryParams, { method: 'GET', credentials: "include" })
+        const token = localStorage.getItem('token')
+        fetch(PROCESSURL + 'check_assignment_exists_for_student?user_id=' + userId + '&' + queryParams, { method: 'GET', credentials: "include", headers: {'Authorization': `Bearer ${token}`} })
             .then((res) => res.json())
             .then((assignment) => {
                 if (!assignment.exists) {
@@ -89,9 +78,8 @@ const Game = () => {
             setShowCongrats(true)
         }
 
-        expressServices.autoSaveProgress({ csrf: csrf, game_string: updatedScores, eggs_collected: updatedEggs, assignment_id: urlRefAssignmentId, user_id: userId })
+        expressServices.autoSaveProgress({ game_string: updatedScores, eggs_collected: updatedEggs, assignment_id: urlRefAssignmentId, user_id: userId })
             .then((result) => {
-                console.log(result)
             })
             .catch((error) => {
                 alert("Failed to save progress! Please refresh the page.")
