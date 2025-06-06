@@ -119,6 +119,11 @@ The frontend application was bootstrapped with Create React App and also managed
    cd frontend && npm start
    cd backend && node index.js
    ```
+6. Login as the admin user
+   ```sh
+   Email Address: admin@bob.com
+   Password: admin
+   ````
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
